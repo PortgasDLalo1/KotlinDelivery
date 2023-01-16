@@ -1,15 +1,30 @@
 package com.eduardo.kotlinudemydelivery.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Toast
+import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.client.home.ClientHomeActivity
 import com.eduardo.kotlinudemydelivery.databinding.ActivityRegisterBinding
+import com.eduardo.kotlinudemydelivery.models.ResponseHttp
+import com.eduardo.kotlinudemydelivery.models.User
+import com.eduardo.kotlinudemydelivery.utils.SharedPref
+import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+
+    var usersProvider = UsersProvider()
+
+    val TAG = "RegisterActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +45,50 @@ class RegisterActivity : AppCompatActivity() {
         val cpass = binding.edittextPasswordrc.text.toString()
 
         if (isValidForm(name, lastname, email, phone, pass, cpass)){
-            Toast.makeText(this,"Formulario valido", Toast.LENGTH_LONG).show()
+            val user = User(
+                name = name,
+                lastname = lastname,
+                email = email,
+                phone = phone,
+                password = pass
+            )
+            usersProvider.register(user)?.enqueue(object: Callback<ResponseHttp>{
+                override fun onResponse(
+                    call: Call<ResponseHttp>,
+                    response: Response<ResponseHttp>
+                ) {
+                    if(response.body()?.isSuccess == true){
+                        saveUserInSession(response.body()?.data.toString())
+                        goToClientHome()
+                        finish()
+                    }
+
+                    Toast.makeText(this@RegisterActivity,response.body()?.message,Toast.LENGTH_LONG).show()
+
+                    Log.d(TAG, "Response: ${response}")
+                    Log.d(TAG, "Body: ${response.body()}")
+                }
+
+                override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                    Log.d(TAG,"Se produjo un error ${t.message}")
+                    Toast.makeText(this@RegisterActivity,"Se produjo un error ${t.message}",Toast.LENGTH_LONG).show()
+                }
+
+            })
         }
+    }
+
+    private fun goToClientHome(){
+        val i = Intent(this, SaveImageActivity::class.java)
+        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK //eliminar historial de pantallas
+        startActivity(i)
+    }
+
+    private fun saveUserInSession(data: String){
+        val sharedPref = SharedPref(this)
+        val gson = Gson()
+        val user = gson.fromJson(data,User::class.java)
+        sharedPref.save("user",user)
     }
 
     fun String.isEmailValid(): Boolean {
