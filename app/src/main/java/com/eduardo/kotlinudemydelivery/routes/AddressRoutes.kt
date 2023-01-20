@@ -1,7 +1,7 @@
 package com.eduardo.kotlinudemydelivery.routes
 
+import com.eduardo.kotlinudemydelivery.models.Address
 import com.eduardo.kotlinudemydelivery.models.Category
-import com.eduardo.kotlinudemydelivery.models.Product
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.User
 import okhttp3.MultipartBody
@@ -18,19 +18,17 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
-interface ProductsRoutes {
+interface AddressRoutes {
 
-   @GET("products/findByCategory/{id_category}")
-    fun findByCategory(
-       @Path("id_category") idCategory: String,
+    @GET("address/findByUser/{id_user}")
+    fun getAddress(
+        @Path("id_user") idUser: String,
         @Header("Authorization") token: String
-    ):Call<ArrayList<Product>>
+    ):Call<ArrayList<Address>>
 
-    @Multipart
-    @POST("products/create")
+    @POST("address/create")
     fun create(
-        @Part images: Array<MultipartBody.Part?>,
-        @Part("product") product: RequestBody,
+        @Body address: Address,
         @Header("Authorization") token: String
     ): Call<ResponseHttp>
 }

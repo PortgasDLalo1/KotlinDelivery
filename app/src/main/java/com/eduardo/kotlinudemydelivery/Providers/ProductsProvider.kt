@@ -21,9 +21,9 @@ class ProductsProvider(val token: String) {
         productsRoutes = api.getProductsRoutes(token)
     }
 
-    /*fun getAll(): Call<ArrayList<Category>>?{
-        return categoriesRoutes?.getAll(token)
-    }*/
+    fun findByCategory(idCategory: String): Call<ArrayList<Product>>?{
+        return productsRoutes?.findByCategory(idCategory,token)
+    }
 
     fun create(files: List<File>, product: Product): Call<ResponseHttp>? {
 

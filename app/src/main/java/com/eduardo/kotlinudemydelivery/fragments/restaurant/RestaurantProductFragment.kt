@@ -15,12 +15,9 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
 import com.eduardo.kotlinudemydelivery.Providers.ProductsProvider
 import com.eduardo.kotlinudemydelivery.R
-import com.eduardo.kotlinudemydelivery.adapters.CategoriesAdapter
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.Product
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
@@ -28,6 +25,7 @@ import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.gson.Gson
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -76,7 +74,7 @@ class RestaurantProductFragment : Fragment() {
         imageView2 = myView?.findViewById(R.id.imageview_2)
         imageView3 = myView?.findViewById(R.id.imageview_3)
 
-        btnCreate = myView?.findViewById(R.id.btn_create)
+        btnCreate = myView?.findViewById(R.id.btn_create_product)
 
         spinnerCategories = myView?.findViewById(R.id.spinner_categories)
 
@@ -117,22 +115,44 @@ class RestaurantProductFragment : Fragment() {
             files.add(imageFile2!!)
             files.add(imageFile3!!)
 
+            ProgressDialogFragment.showProgressBar(requireActivity())
+
             productsProvider?.create(files, product)?.enqueue(object: Callback<ResponseHttp>{
                 override fun onResponse(
                     call: Call<ResponseHttp>,
                     response: Response<ResponseHttp>
                 ) {
+                    ProgressDialogFragment.hideProgressBar(requireActivity())
+
                     Log.d(TAG, "Reponse: $response")
                     Log.d(TAG, "Body: ${response.body()}")
-                    Toast.makeText(requireContext(), response.body()?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), response.body()?.message, Toast.LENGTH_LONG).show()
+
+                    if (response.body()?.isSuccess == true){
+                        resetForm()
+                    }
                 }
 
                 override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                    ProgressDialogFragment.hideProgressBar(requireActivity())
+
                     Log.d(TAG, "Error: ${t.message}")
                     Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_LONG).show()
                 }
             })
         }
+    }
+
+    private fun resetForm(){
+        editTextName?.setText("")
+        editTextDescription?.setText("")
+        editTextPrice?.setText("")
+        imageFile1 = null
+        imageFile2 = null
+        imageFile3 = null
+        imageView1?.setImageResource(R.drawable.ic_image)
+        imageView2?.setImageResource(R.drawable.ic_image)
+        imageView3?.setImageResource(R.drawable.ic_image)
     }
 
     private fun isValidForm(name: String, description: String, price: String): Boolean {

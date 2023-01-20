@@ -13,7 +13,7 @@ class Product(
     @SerializedName("image3") val image3: String? = null,
     @SerializedName("id_category") val idCategory: String,
     @SerializedName("price") val price: Double,
-    @SerializedName("quantity") val quantity: Int? = null
+    @SerializedName("quantity") var quantity: Int? = null
 ) {
 
     fun toJson(): String {

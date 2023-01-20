@@ -1,11 +1,10 @@
 package com.eduardo.kotlinudemydelivery.fragments.client
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.client.shopping_bag.ClientShoppingBagActivity
 import com.eduardo.kotlinudemydelivery.adapters.CategoriesAdapter
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.User
@@ -41,9 +41,9 @@ class ClientCategoriesFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         myView = inflater.inflate(R.layout.fragment_client_categories, container, false)
-
+        setHasOptionsMenu(true)
         toolbar = myView?.findViewById(R.id.toolbar)
-        toolbar?.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        toolbar?.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         toolbar?.title = "Categorias"
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
@@ -58,6 +58,23 @@ class ClientCategoriesFragment : Fragment() {
 
         getCategories()
         return myView
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_shopping_bag, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == R.id.item_shopping_bag){
+            goToShoppingBag()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun goToShoppingBag(){
+        val i = Intent(requireContext(),ClientShoppingBagActivity::class.java)
+        startActivity(i)
     }
 
     private fun getCategories(){

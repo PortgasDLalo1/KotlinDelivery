@@ -41,7 +41,7 @@
         android:background="@drawable/rounded_button"
         android:layout_gravity="bottom"
         android:layout_marginBottom="75dp"
-        app:backgroundTint="@color/black"
-        android:textColor="@color/green"/>
+        app:backgroundTint="@color/green"
+        android:textColor="@color/white"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

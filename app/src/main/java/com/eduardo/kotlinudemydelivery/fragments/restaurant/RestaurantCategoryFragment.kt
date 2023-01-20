@@ -21,6 +21,7 @@ import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.gson.Gson
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -79,11 +80,16 @@ class RestaurantCategoryFragment : Fragment() {
 
             val category = Category(name = name)
 
+            ProgressDialogFragment.showProgressBar(requireActivity())
+
             categoriesProvider?.create(imageFile!!, category)?.enqueue(object : Callback<ResponseHttp> {
                 override fun onResponse(
                     call: Call<ResponseHttp>,
                     response: Response<ResponseHttp>
                 ) {
+
+                    ProgressDialogFragment.hideProgressBar(requireActivity())
+
                     Log.d(TAG, "RESPONSE: $response")
                     Log.d(TAG, "BODY: ${response.body()}")
 
