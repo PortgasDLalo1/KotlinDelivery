@@ -37,7 +37,8 @@
             android:layout_height="30dp"
             android:src="@drawable/ic_check"
             android:layout_marginLeft="20dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:visibility="gone"/>
 
 
     </LinearLayout>

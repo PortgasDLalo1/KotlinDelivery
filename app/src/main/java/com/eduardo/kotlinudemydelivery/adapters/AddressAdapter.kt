@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.client.address.list.ClientAddressListActivity
 import com.eduardo.kotlinudemydelivery.activities.client.home.ClientHomeActivity
 import com.eduardo.kotlinudemydelivery.activities.client.products.list.ClientProductsListActivity
 import com.eduardo.kotlinudemydelivery.activities.delivery.home.DeliveryHomeActivity
@@ -18,10 +19,14 @@ import com.eduardo.kotlinudemydelivery.models.Address
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.Rol
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
+import com.google.gson.Gson
 
 class AddressAdapter(val context: Activity, val address: ArrayList<Address>): RecyclerView.Adapter<AddressAdapter.AddressViewHolder>() {
 
     val sharedPref = SharedPref(context)
+    var gson = Gson()
+    var prev = 0
+    var positionAddressSession = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AddressViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cardview_address, parent,false)
@@ -35,9 +40,30 @@ class AddressAdapter(val context: Activity, val address: ArrayList<Address>): Re
     override fun onBindViewHolder(holder: AddressViewHolder, position: Int) {
         val a = address[position] //cada categoria
 
+        if (!sharedPref.getData("address").isNullOrBlank()){ // si ya eligio una direccion anteriormente
+            val adr = gson.fromJson(sharedPref.getData("address"), Address::class.java)
+
+            if (adr.id == a.id){
+                positionAddressSession = position
+                holder.imageViewCheck.visibility = View.VISIBLE
+            }
+        }
+
         holder.textViewAddress.text = a.address
         holder.textViewNeighborhood.text = a.neighborhood
 
+        holder.itemView.setOnClickListener {
+            (context as ClientAddressListActivity).resetValue(prev)
+            (context as ClientAddressListActivity).resetValue(positionAddressSession)
+            prev = position
+            holder.imageViewCheck.visibility = View.VISIBLE
+            saveAddress(a.toJson())
+        }
+    }
+
+    private fun saveAddress(data: String){
+        val ad = gson.fromJson(data,Address::class.java)
+        sharedPref.save("address",ad)
     }
 
     class AddressViewHolder(view: View): RecyclerView.ViewHolder(view){

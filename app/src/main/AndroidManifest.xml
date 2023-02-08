@@ -6,10 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -25,6 +24,51 @@
         android:theme="@style/Theme.KotlinUdemyDelivery"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.client.orders.map.ClientOrdersMapActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.delivery.orders.map.DeliveryOrdersMapActivity"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.delivery.orders.detail.DeliveryOrdersDetailActivity"
+            android:exported="true"
+            android:parentActivityName=".activities.delivery.home.DeliveryHomeActivity">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.restaurant.orders.detail.RestaurantOrdersDetailActivity"
+            android:exported="true"
+            android:parentActivityName=".activities.restaurant.home.RestaurantHomeActivity">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.client.orders.detail.ClientOrdersDetailActivity"
+            android:exported="true"
+            android:parentActivityName=".activities.client.home.ClientHomeActivity">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.client.payments.form.ClientPaymentFormActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".activities.client.address.map.ClientAddressMapActivity"
             android:exported="false">

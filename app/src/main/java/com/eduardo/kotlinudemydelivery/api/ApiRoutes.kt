@@ -1,9 +1,6 @@
 package com.eduardo.kotlinudemydelivery.api
 
-import com.eduardo.kotlinudemydelivery.routes.AddressRoutes
-import com.eduardo.kotlinudemydelivery.routes.CategoriesRoutes
-import com.eduardo.kotlinudemydelivery.routes.ProductsRoutes
-import com.eduardo.kotlinudemydelivery.routes.UsersRoutes
+import com.eduardo.kotlinudemydelivery.routes.*
 
 class ApiRoutes {
 
@@ -29,6 +26,10 @@ class ApiRoutes {
 
     fun getProductsRoutes(token: String): ProductsRoutes {
         return retrofit.getClientWithToken(API_URL, token).create(ProductsRoutes::class.java)
+    }
+
+    fun getOrdersRoutes(token: String): OrdersRoutes {
+        return retrofit.getClientWithToken(API_URL, token).create(OrdersRoutes::class.java)
     }
 
 }

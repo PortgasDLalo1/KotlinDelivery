@@ -1,6 +1,7 @@
 package com.eduardo.kotlinudemydelivery.Providers
 
 import com.eduardo.kotlinudemydelivery.api.ApiRoutes
+import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.routes.UsersRoutes
@@ -21,6 +22,10 @@ class UsersProvider(val token: String? = null) {
         if (token != null) {
             usersRoutesToken = api.getUserRoutesWithToken(token)
         }
+    }
+
+    fun getDelivery(): Call<ArrayList<User>>?{
+        return usersRoutesToken?.getDelivery(token!!)
     }
 
     fun register(user: User): Call<ResponseHttp>? {
