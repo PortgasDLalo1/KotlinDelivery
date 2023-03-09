@@ -25,6 +25,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".activities.client.payments.installments.ClientPaymentsInstallmentsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.client.orders.map.ClientOrdersMapActivity"
             android:exported="false">
             <meta-data
