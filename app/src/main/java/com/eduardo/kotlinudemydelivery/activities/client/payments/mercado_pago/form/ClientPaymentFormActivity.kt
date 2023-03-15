@@ -1,11 +1,13 @@
-package com.eduardo.kotlinudemydelivery.activities.client.payments.form
+package com.eduardo.kotlinudemydelivery.activities.client.payments.mercado_pago.form
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.eduardo.kotlinudemydelivery.Providers.MercadoPagoProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.client.payments.mercado_pago.installments.ClientPaymentsInstallmentsActivity
 import com.eduardo.kotlinudemydelivery.models.Cardholder
 import com.eduardo.kotlinudemydelivery.models.MercadoPagoCardTokenBody
 import com.google.gson.JsonObject
@@ -139,6 +141,11 @@ class ClientPaymentFormActivity : AppCompatActivity() {
         )
         mercadoPagoProvider.createCardToken(mercadoPagoCardTokenBody)?.enqueue(object: Callback<JsonObject>{
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.body()!=null){
+                    val cardToken = response.body()?.get("id")?.asString
+                    val firstSixDigits = response.body()?.get("first_six_digits")?.asString
+                    goToInstallments(cardToken!!,firstSixDigits!!)
+                }
                 Log.d(TAG, "Response: $response")
                 Log.d(TAG, "body: ${response.body()}")
             }
@@ -148,6 +155,12 @@ class ClientPaymentFormActivity : AppCompatActivity() {
         })
     }
 
+    private fun goToInstallments(cardToken: String, firstSixDigits: String){
+        val i = Intent(this, ClientPaymentsInstallmentsActivity::class.java)
+        i.putExtra("cardToken",cardToken)
+        i.putExtra("firstSixDigits", firstSixDigits)
+        startActivity(i)
+    }
     override fun onBackPressed() {
         if (creditCardFlow?.currentState() == CardFlowState.ACTIVE_CARD_NUMBER || creditCardFlow?.currentState() == CardFlowState.INACTIVE_CARD_NUMBER){
             finish()

@@ -25,7 +25,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".activities.client.payments.installments.ClientPaymentsInstallmentsActivity"
+            android:name=".activities.client.payments.paypal.form.ClientPaymentsPaypalFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.client.payments.payment_method.ClientPaymentMethodActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.client.address.list.ClientAddressListActivity" />
+        <activity
+            android:name=".activities.client.payments.mercado_pago.status.ClientPaymentsStatusActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.client.payments.mercado_pago.installments.ClientPaymentsInstallmentsActivity"
             android:exported="false" />
         <activity
             android:name=".activities.client.orders.map.ClientOrdersMapActivity"
@@ -66,7 +76,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".activities.client.payments.form.ClientPaymentFormActivity"
+            android:name=".activities.client.payments.mercado_pago.form.ClientPaymentFormActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
@@ -184,6 +194,17 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDSsni9fnDj8n425Hv7FhtvfGB8oqNGhdI" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+
+        <service
+            android:name=".services.MyFirebaseMessagingClient"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
