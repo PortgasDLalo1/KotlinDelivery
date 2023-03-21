@@ -18,6 +18,13 @@ interface UsersRoutes {
     @POST("users/create")
     fun register(@Body user: User): Call<ResponseHttp>
 
+
+    @POST("users/createDelivery")
+    fun registerDelivery(
+        @Body user: User,
+         @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
     @FormUrlEncoded
     @POST("users/login")
     fun login(@Field("email") email: String, @Field("password") password: String): Call<ResponseHttp>
@@ -40,5 +47,10 @@ interface UsersRoutes {
     fun updateNotificationToken(
         @Body user: User,
         @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
+    @DELETE("users/deleteDelivery/{id_user}")
+    fun deleteDelivery(
+        @Path("id_user") id_user: Int
     ): Call<ResponseHttp>
 }

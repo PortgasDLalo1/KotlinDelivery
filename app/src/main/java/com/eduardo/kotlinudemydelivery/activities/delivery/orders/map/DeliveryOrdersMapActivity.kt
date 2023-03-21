@@ -16,7 +16,6 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.bumptech.glide.Glide
 import com.eduardo.kotlinudemydelivery.Providers.OrdersProvider
@@ -29,7 +28,10 @@ import com.eduardo.kotlinudemydelivery.models.SocketEmit
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.eduardo.kotlinudemydelivery.utils.SocketHandler
+import com.example.easywaylocation.EasyWayLocation
+import com.example.easywaylocation.Listener
 import com.example.easywaylocation.draw_path.DirectionUtil
+import com.example.easywaylocation.draw_path.PolyLineDataBean
 import com.github.nkzawa.socketio.client.Socket
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -47,8 +49,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
+class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Listener, DirectionUtil.DirectionCallBack {
     private lateinit var binding: ActivityDeliveryOrdersMapBinding
+    private var easyWayLocation: EasyWayLocation? = null
+
     var googleMap: GoogleMap? = null
     val PERMISSION_ID = 42
     var fusedLocationClient: FusedLocationProviderClient? = null
@@ -61,14 +65,10 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
     var markerDelivery: Marker? = null
     var markerAddress: Marker? = null
     var myLocationLatLng: LatLng? = null
+    var locationDelivery: LatLng? = null
 
     var order: Order? = null
     var gson = Gson()
-
-    var wayPoints: ArrayList<LatLng> = ArrayList()
-    val WAY_POINT_TAG = "way_point_tag"
-    private lateinit var directionUtil: DirectionUtil
-
     val REQUEST_PHONE_CALL = 18
 
     var ordersProvider: OrdersProvider? = null
@@ -78,6 +78,14 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
     var distanceBetween = 0.0f
 
     var socket: Socket? = null
+
+    private var wayPoints: ArrayList<LatLng> = ArrayList()
+    private val WAY_POINT_TAG = "way_poiny_tag"
+    private var directionUtil: DirectionUtil? = null
+
+    private var originLatLng: LatLng? = null
+    private var destinationLatLng: LatLng? = null
+
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -94,10 +102,9 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
             )*/
 
             distanceBetween = getDistanceBetween(myLocationLatLng!!, addressLatLng!!)
-
             removeDeliveryMarker()
             addDeliveryMarker()
-            Log.d("LOCALIZACION", "Callback: $lastLocation")
+//            Log.d("LOCALIZACION", "Callback: $lastLocation")
         }
     }
 
@@ -143,6 +150,15 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         connectSocket()
+
+        val locationRequest = LocationRequest.create().apply {
+            interval = 0
+            fastestInterval = 0
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+            smallestDisplacement = 1f
+        }
+        easyWayLocation = EasyWayLocation(this,locationRequest,false,false,this)
+
     }
 
     private fun emitPosition(){
@@ -168,6 +184,7 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         socket?.disconnect()
+        easyWayLocation?.endUpdates()
     }
 
     private fun updateOrder(){
@@ -235,6 +252,26 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    private fun easyDrawRoute(myPosition2: LatLng){
+        val addressLocation = LatLng(order?.address?.lat!!,order?.address?.lng!!)
+        wayPoints.clear()
+        wayPoints.add(myPosition2)
+        wayPoints.add(addressLocation)
+        directionUtil = DirectionUtil.Builder()
+            .setDirectionKey(resources.getString(R.string.google_map_api_key))
+            .setOrigin(myLocationLatLng!!)
+            .setWayPoints(wayPoints)
+            .setGoogleMap(googleMap!!)
+            .setPolyLinePrimaryColor(R.color.black)
+            .setPolyLineWidth(10)
+            .setPathAnimation(false)
+            .setCallback(this)
+            .setDestination(addressLocation)
+            .build()
+
+        directionUtil!!.initPath()
+    }
+
     private fun removeDeliveryMarker(){
         markerDelivery?.remove()
     }
@@ -275,6 +312,7 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         googleMap?.uiSettings?.isZoomControlsEnabled = true
+        easyWayLocation?.startLocation()
     }
 
     private fun updateLatLng(lat: Double, lng: Double){
@@ -314,8 +352,8 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         removeDeliveryMarker()
                         addDeliveryMarker()
                         addAddressMarker()
-                        drawRoute()
-
+//                        drawRoute()
+                        easyDrawRoute(myLocationLatLng!!)
                         googleMap?.moveCamera(
                             CameraUpdateFactory.newCameraPosition(
                                 CameraPosition.builder().target(
@@ -416,4 +454,34 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
         }
     }
+
+    override fun locationOn() {
+
+    }
+
+    override fun currentLocation(location: Location?) {
+        Log.d(TAG,"Se mueve en el current")
+
+        /*    var locarion : LatLng = LatLng(location?.latitude!!,location.longitude)
+//           easyDrawRoute()
+        if (locarion != null){
+            directionUtil?.clearPolyline(WAY_POINT_TAG)
+            easyDrawRoute(locarion)
+            removeDeliveryMarker()
+            addDeliveryMarker()
+        }*/
+    }
+
+    override fun locationCancelled() {
+
+    }
+
+    override fun pathFindFinish(
+        polyLineDetailsMap: HashMap<String, PolyLineDataBean>,
+        polyLineDetailsArray: ArrayList<PolyLineDataBean>
+    ) {
+        directionUtil?.drawPath(WAY_POINT_TAG)
+
+    }
+
 }

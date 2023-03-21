@@ -74,6 +74,9 @@ class UsersProvider(val token: String? = null) {
         return usersRoutes?.register(user)
     }
 
+    fun registerDelivery(user: User): Call<ResponseHttp>? {
+        return usersRoutes?.registerDelivery(user,token!!)
+    }
     fun login(email: String, password: String): Call<ResponseHttp>? {
         return usersRoutes?.login(email, password)
     }
@@ -92,5 +95,9 @@ class UsersProvider(val token: String? = null) {
 
     fun updateNotificationToken(user: User): Call<ResponseHttp>? {
         return usersRoutesToken?.updateNotificationToken(user, token!!)
+    }
+
+    fun deleteDelivery(id_user: Int):Call<ResponseHttp>?{
+        return usersRoutes?.deleteDelivery(id_user)
     }
 }

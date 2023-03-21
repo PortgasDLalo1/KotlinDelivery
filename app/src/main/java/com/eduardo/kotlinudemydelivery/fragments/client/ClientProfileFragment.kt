@@ -64,6 +64,13 @@ class ClientProfileFragment : Fragment() {
             Glide.with(requireContext()).load(user?.image).into(circleImageUser!!)
         }
 
+        val idRol = user?.roles?.size
+        if(idRol == 1){
+            buttonSelectRol?.visibility = View.INVISIBLE
+        }else{
+            buttonSelectRol?.visibility = View.VISIBLE
+        }
+
         return myView
     }
 

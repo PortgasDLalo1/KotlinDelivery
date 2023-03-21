@@ -28,7 +28,10 @@ import com.eduardo.kotlinudemydelivery.models.SocketEmit
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.eduardo.kotlinudemydelivery.utils.SocketHandler
+import com.example.easywaylocation.EasyWayLocation
+import com.example.easywaylocation.Listener
 import com.example.easywaylocation.draw_path.DirectionUtil
+import com.example.easywaylocation.draw_path.PolyLineDataBean
 import com.github.nkzawa.socketio.client.Socket
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -43,7 +46,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import kotlin.math.ln
 
-class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
+class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Listener, DirectionUtil.DirectionCallBack {
     private lateinit var binding: ActivityClientOrdersMapBinding
     var googleMap: GoogleMap? = null
     val PERMISSION_ID = 42
@@ -74,6 +77,7 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     var socket: Socket? = null
 
+    private var easyWayLocation: EasyWayLocation? = null
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -122,8 +126,8 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.textviewDireccion.text = order?.address?.address
         binding.textviewNb.text = order?.address?.neighborhood
 
-        if (!order?.client?.image.isNullOrBlank()) {
-            Glide.with(this).load(order?.client?.image).into(binding.circleImageUser2)
+        if (!order?.delivery?.image.isNullOrBlank()) {
+            Glide.with(this).load(order?.delivery?.image).into(binding.circleImageUser2)
         }
 
         binding.imageviewPhone.setOnClickListener {
@@ -134,6 +138,14 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 call()
             }
         }
+
+        val locationRequest = LocationRequest.create().apply {
+            interval = 0
+            fastestInterval = 0
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+            smallestDisplacement = 1f
+        }
+        easyWayLocation = EasyWayLocation(this,locationRequest,false,false,this)
     }
 
     private fun connectSocket(){
@@ -194,6 +206,26 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 markers = false
             )
         }
+    }
+
+    private fun easyDrawRoute(myPosition2: LatLng){
+        val addressLocation = LatLng(order?.address?.lat!!,order?.address?.lng!!)
+        wayPoints.clear()
+        wayPoints.add(myPosition2)
+        wayPoints.add(addressLocation)
+        directionUtil = DirectionUtil.Builder()
+            .setDirectionKey(resources.getString(R.string.google_map_api_key))
+            .setOrigin(myLocationLatLng!!)
+            .setWayPoints(wayPoints)
+            .setGoogleMap(googleMap!!)
+            .setPolyLinePrimaryColor(R.color.black)
+            .setPolyLineWidth(10)
+            .setPathAnimation(false)
+            .setCallback(this)
+            .setDestination(addressLocation)
+            .build()
+
+        directionUtil!!.initPath()
     }
 
     private fun removeDeliveryMarker(){
@@ -258,8 +290,8 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         removeDeliveryMarker()
                         addDeliveryMarker(deliveryLatLng?.latitude!!, deliveryLatLng?.longitude!!)
                         addAddressMarker()
-                        drawRoute()
-
+//                        drawRoute()
+                        easyDrawRoute(myLocationLatLng!!)
                         if (deliveryLatLng != null) {
                             googleMap?.moveCamera(
                                 CameraUpdateFactory.newCameraPosition(
@@ -360,5 +392,22 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback {
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
         }
+    }
+
+    override fun locationOn() {
+
+    }
+
+    override fun currentLocation(location: Location?) {
+    }
+
+    override fun locationCancelled() {
+    }
+
+    override fun pathFindFinish(
+        polyLineDetailsMap: HashMap<String, PolyLineDataBean>,
+        polyLineDetailsArray: ArrayList<PolyLineDataBean>
+    ) {
+        directionUtil?.drawPath(WAY_POINT_TAG)
     }
 }

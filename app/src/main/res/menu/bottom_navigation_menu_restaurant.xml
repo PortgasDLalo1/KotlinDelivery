@@ -21,4 +21,9 @@
         android:icon="@drawable/ic_person_pin"
         android:title="Perfil"/>
 
+    <item
+        android:id="@+id/item_build"
+        android:icon="@drawable/ic_build"
+        android:title="Config."/>
+
 </menu>

@@ -1,14 +1,19 @@
 package com.eduardo.kotlinudemydelivery.activities
 
+import android.Manifest
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.home.ClientHomeActivity
@@ -18,7 +23,9 @@ import com.eduardo.kotlinudemydelivery.databinding.ActivityMainBinding
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
+import com.eduardo.kotlinudemydelivery.utils.printTicket
 import com.google.gson.Gson
+import com.mazenrashed.printooth.ui.ScanningActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     var usersProvider = UsersProvider()
-
+    val TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -38,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener { login() }
 
         getUserFromSession()
+
     }
 
     private fun login(){
@@ -51,11 +59,12 @@ class MainActivity : AppCompatActivity() {
                     response: Response<ResponseHttp>
                 ) {
 
-                    Log.d("MainActivity1", "Response: ${response.body()}")
+                    Log.d(TAG, "Response: ${response.body()}")
 
                     if (response.body()?.isSuccess == true){
                         Toast.makeText(this@MainActivity,response.body()?.message, Toast.LENGTH_LONG).show()
                         saveUserInSession(response.body()?.data.toString())
+
                     }else{
                         Toast.makeText(this@MainActivity,"Los datos ingresados no son correctos", Toast.LENGTH_LONG).show()
                     }
@@ -105,7 +114,15 @@ class MainActivity : AppCompatActivity() {
         if(user.roles?.size!! > 1){ // tiene mas de 1 rol
             goToSelectRol()
         }else { // solo tiene 1 rol CLIENTE
-            goToClientHome()
+
+            val idRol = user.roles[0].id.toInt()
+            if (idRol == 1){
+                goToClientHome()
+            }else if (idRol == 2){
+                goToRestaurantHome()
+            }else if (idRol == 3){
+                goToDeliveryHome()
+            }
         }
     }
 
@@ -119,18 +136,20 @@ class MainActivity : AppCompatActivity() {
         if (!sharedPref.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             val user = gson.fromJson(sharedPref.getData("user"),User::class.java)
+            val nameRol = user.roles?.get(0)?.name
+            Log.d(TAG, "user $nameRol")
 
             if (!sharedPref.getData("rol").isNullOrBlank()) {
                 //si el usuario selecciono el rol
-                val rol = sharedPref.getData("rol")?.replace("\"","")
+//                val rol = sharedPref.getData("rol")?.replace("\"","")
 
-                if (rol == "RESTAURANTE"){
+                if (nameRol == "RESTAURANTE"){
                     goToRestaurantHome()
                 }
-                else if (rol == "CLIENTE"){
+                else if (nameRol == "CLIENTE"){
                     goToClientHome()
                 }
-                else if (rol == "REPARTIDOR"){
+                else if (nameRol == "REPARTIDOR"){
                     goToDeliveryHome()
                 }
             }
@@ -161,4 +180,5 @@ class MainActivity : AppCompatActivity() {
         val i = Intent(this,RegisterActivity::class.java)
         startActivity(i)
     }
+
 }

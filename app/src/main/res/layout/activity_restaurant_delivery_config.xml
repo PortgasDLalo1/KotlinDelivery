@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.restaurant.config.delivery.RestaurantDeliveryConfigActivity">
+
+    <include layout="@layout/action_bar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="70dp">
+
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            android:layout_marginHorizontal="20dp"-->
+<!--            android:layout_weight="1"-->
+<!--            app:cardCornerRadius="16dp"-->
+<!--            app:cardElevation="0dp"-->
+<!--            app:cardBackgroundColor="#B3EAE5E5">-->
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_delivery"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+<!--        </androidx.cardview.widget.CardView>-->
+
+        <Button
+            android:id="@+id/btn_registerDelivery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar REpartidor"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/rounded_button"
+            android:layout_marginVertical="20dp"/>
+
+    </LinearLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
