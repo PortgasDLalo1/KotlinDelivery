@@ -95,6 +95,7 @@ class ClientProfileFragment : Fragment() {
 
     private fun logout(){
         sharedPref?.remove("user")
+        sharedPref?.remove("sucursal")
         val i = Intent(requireContext(), MainActivity::class.java)
         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK //eliminar historial de pantallas
         startActivity(i)

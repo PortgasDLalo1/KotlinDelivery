@@ -9,11 +9,16 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextUtils
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
+import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.home.ClientHomeActivity
@@ -34,16 +39,57 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    var edittextEmail: EditText? = null
     var usersProvider = UsersProvider()
     val TAG = "MainActivity"
+    val count = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        edittextEmail = findViewById(R.id.edittext_email)
+
         binding.imageviewGoToRegister.setOnClickListener { goToRegister() }
 
         binding.btnLogin.setOnClickListener { login() }
+
+       /* edittextEmail?.addTextChangedListener(object : TextWatcher{
+            private val space = ' '
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+//                Toast.makeText(this@MainActivity, "CHAR: $s, start: $start, before: $before, count: $count", Toast.LENGTH_SHORT).show()
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                var pos = 0;
+                while (true){
+                    if (pos >= s?.length!!) break
+                    if (space == s[pos] && (((pos +1)%5)!= 0 || pos +1 == s.length)){
+                        s.delete(pos,pos+1)
+                    }else{
+                        pos++
+                    }
+                }
+
+                pos = 4;
+                while (true){
+                    if (pos >= s.length)break
+                    val c = s[pos]
+
+                    if ("0123456789".indexOf(c) >= 0){
+                        s.insert(pos,"" + space)
+                    }
+                    pos +=5
+                }
+            }
+
+        })*/
 
         getUserFromSession()
 
@@ -120,7 +166,7 @@ class MainActivity : AppCompatActivity() {
 
         if(user.roles?.size!! > 1){ // tiene mas de 1 rol
             goToSelectRol()
-        }else { // solo tiene 1 rol CLIENTE
+        }else { // solo tiene 1 rol
 
             val idRol = user.roles[0].id.toInt()
             if (idRol == 1){
@@ -148,7 +194,7 @@ class MainActivity : AppCompatActivity() {
             val nameRol = user.roles?.get(0)?.name
             Log.d(TAG, "user $nameRol")
 
-            if (!sharedPref.getData("rol").isNullOrBlank()) {
+            if (!nameRol.isNullOrBlank()) {
                 //si el usuario selecciono el rol
 //                val rol = sharedPref.getData("rol")?.replace("\"","")
 

@@ -15,8 +15,8 @@ object SocketPaymentHandler {
     fun setSocket(){
         try {
 //             mSocket = IO.socket("http://10.72.6.224:3000/orders/payment")
-            mSocket = IO.socket("https://kotlin-delivery-udemy.onrender.com/")
-//            mSocket = IO.socket("http://10.72.6.224:3000")
+//            mSocket = IO.socket("https://kotlin-delivery-udemy.onrender.com/")
+            mSocket = IO.socket("http://10.72.6.224:3000")
         }catch (e: URISyntaxException){
             Log.d("Error","No se pudo conectar el socket ${e.message}")
         }

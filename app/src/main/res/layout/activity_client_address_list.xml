@@ -50,6 +50,7 @@
         app:backgroundTint="@color/green"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="100dp"
-        android:layout_marginRight="25dp"/>
+        android:layout_marginRight="25dp"
+        android:contentDescription="address" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

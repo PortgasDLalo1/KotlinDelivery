@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.eduardo.kotlinudemydelivery.Providers.OrdersProvider
+import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.adapters.OrdersRestaurantAdapter
@@ -21,9 +22,7 @@ import com.eduardo.kotlinudemydelivery.fragments.client.ClientCategoriesFragment
 import com.eduardo.kotlinudemydelivery.fragments.client.ClientOrdersFragment
 import com.eduardo.kotlinudemydelivery.fragments.client.ClientProfileFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.*
-import com.eduardo.kotlinudemydelivery.models.Order
-import com.eduardo.kotlinudemydelivery.models.SocketEmitPagado
-import com.eduardo.kotlinudemydelivery.models.User
+import com.eduardo.kotlinudemydelivery.models.*
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.eduardo.kotlinudemydelivery.utils.SocketPaymentHandler
 import com.eduardo.kotlinudemydelivery.utils.printTicket
@@ -45,14 +44,16 @@ import retrofit2.Response
 class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
 
     private lateinit var binding: ActivityRestaurantHomeBinding
-    private val TAG = "RestaurantHomeActivity"
+    private val TAG = "RestaurantHome"
     var sharedPref: SharedPref? = null
 
     var bottomNavigation: BottomNavigationView? = null
 
     var usersProvider: UsersProvider? = null
+    var sucursalesProvider: SucursalesProvider? = null
     var ordersProvider: OrdersProvider? = null
     var user: User? = null
+    var sucursales: Sucursales? = null
     var mSocket: Socket? = null
     var gson = Gson()
 
@@ -101,10 +102,12 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
             }
         }
         getUserFromSession()
+        createToken()
         usersProvider = UsersProvider(token = user?.sessionToken!!)
         ordersProvider = OrdersProvider(user?.sessionToken!!)
-        createToken()
+        sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
         //binding.btnLogout.setOnClickListener { logout() }
+        getSucursal()
         checaBluetooth()
         Printooth.init(this)
         checarPrint()
@@ -193,6 +196,29 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
             user = gson.fromJson(sharedPref?.getData("user"),User::class.java)
             Log.e(TAG, "Usuario: $user")
         }
+    }
+
+    private fun getSucursal(){
+        sucursalesProvider?.getSucursal(user?.id!!)?.enqueue(object :Callback<ResponseHttp>{
+            override fun onResponse(
+                call: Call<ResponseHttp>,
+                response: Response<ResponseHttp>
+            ) {
+                saveSucursalSession(response.body()?.data.toString())
+//                Log.d(TAG, "BODYY: ${response.body()}")
+            }
+
+            override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                Toast.makeText(this@RestaurantHomeActivity, "Hubo un error ${t.message}", Toast.LENGTH_LONG).show()
+            }
+
+        })
+    }
+
+    private fun saveSucursalSession(data: String){
+        val sucursal = gson.fromJson(data,Sucursales::class.java)
+        sharedPref?.save("sucursal",sucursal)
+        Log.d(TAG,sucursal.toString())
     }
 
     private fun checaBluetooth() {

@@ -38,6 +38,9 @@
         tools:replace="android:theme"
         tools:targetApi="31">
         <activity
+            android:name=".ClientCardListActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.waiter.home.WaiterHomeActivity"
             android:exported="false" />
         <activity
