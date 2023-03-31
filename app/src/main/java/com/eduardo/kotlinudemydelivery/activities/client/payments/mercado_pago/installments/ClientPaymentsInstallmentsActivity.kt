@@ -114,11 +114,15 @@ class ClientPaymentsInstallmentsActivity : AppCompatActivity() {
                     Toast.makeText(this@ClientPaymentsInstallmentsActivity, response.body()?.message, Toast.LENGTH_LONG)
                         .show()
 
-                    val status = response.body()?.data?.get("status")?.asString
-                    val lastFour = response.body()?.data?.get("card")?.asJsonObject?.get("last_four_digits")?.asString
-                    goToPaymentsStatus(paymentMethodId,status!!,lastFour!!)
+                    val status = response.body()?.data?.get("dataPayment")?.asJsonObject?.get("status")?.asString
+                    //Log.d(TAG, "Response body: ${response.body()?.data?.get("id_order")?.asString}")
+//                    val lastFour = response.body()?.data?.get("card")?.asJsonObject?.get("last_four_digits")?.asString
+                    val lastFour = response.body()?.data?.get("dataPayment")?.asJsonObject?.get("card")?.asJsonObject?.get("last_four_digits")?.asString
+                    val idOrder = response.body()?.data?.get("id_order")?.asString
+                    //Log.d(TAG, "Response body: ${response.body()?.data?.get("id_order")?.asString} status: $status lastfour: $lastFour")
+                    goToPaymentsStatus(paymentMethodId,status!!,lastFour!!,idOrder!!)
                 }else{
-                    goToPaymentsStatus(paymentMethodId,"denied","")
+                    goToPaymentsStatus(paymentMethodId,"denied","","")
                     Toast.makeText(this@ClientPaymentsInstallmentsActivity, "No hubo una respuesta exitosa", Toast.LENGTH_LONG)
                         .show()
                 }
@@ -133,11 +137,12 @@ class ClientPaymentsInstallmentsActivity : AppCompatActivity() {
         })
     }
 
-    private fun goToPaymentsStatus(paymentMethodId: String, paymentStatus: String, lastFourDigits: String){
+    private fun goToPaymentsStatus(paymentMethodId: String, paymentStatus: String, lastFourDigits: String, id_order: String){
         val i = Intent(this, ClientPaymentsStatusActivity::class.java)
         i.putExtra("paymentMethodId", paymentMethodId)
         i.putExtra("paymentStatus", paymentStatus)
         i.putExtra("lastFourDigits", lastFourDigits)
+        i.putExtra("idOrder", id_order)
         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(i)
     }

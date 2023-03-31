@@ -2,19 +2,19 @@ package com.eduardo.kotlinudemydelivery.utils
 
 import android.util.Log
 import io.socket.client.IO
-import io.socket.client.Socket
 //import com.github.nkzawa.socketio.client.Socket
 //import com.github.nkzawa.socketio.client.IO
+import io.socket.client.Socket
 import java.net.URISyntaxException
 
-object SocketHandler {
+object SocketPaymentHandler {
 
     lateinit var mSocket: Socket
-
+//"socket.io": "^2.4.1",
     @Synchronized
     fun setSocket(){
         try {
-//             mSocket = IO.socket("http://10.72.6.224:3000/orders/delivery")
+//             mSocket = IO.socket("http://10.72.6.224:3000/orders/payment")
             mSocket = IO.socket("https://kotlin-delivery-udemy.onrender.com/")
 //            mSocket = IO.socket("http://10.72.6.224:3000")
         }catch (e: URISyntaxException){

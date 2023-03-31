@@ -31,6 +31,10 @@ class OrdersProvider(val token: String) {
         return ordersRoutes?.getOrdersByClientAndStatus(idClient,status,token)
     }
 
+    fun getOrdersByIdOrder(idOrder: String): Call<ArrayList<Order>>?{
+        return ordersRoutes?.getOrdersByIdOrder(idOrder,token)
+    }
+
     fun create(order: Order): Call<ResponseHttp>? {
         return  ordersRoutes?.create(order, token)
     }

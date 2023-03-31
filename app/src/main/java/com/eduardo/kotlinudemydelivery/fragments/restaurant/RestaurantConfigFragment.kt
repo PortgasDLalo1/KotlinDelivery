@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.restaurant.config.delivery.RestaurantDeliveryConfigActivity
 import com.eduardo.kotlinudemydelivery.activities.restaurant.config.box.RestaurantConfigBoxActivity
+import com.eduardo.kotlinudemydelivery.activities.restaurant.config.waiter.RestaurantConfigWaiterActivity
 
 class RestaurantConfigFragment : Fragment() {
 
@@ -17,6 +18,7 @@ class RestaurantConfigFragment : Fragment() {
 
     var cardDelivery: CardView? = null
     var cardCaja: CardView? = null
+    var cardMeseros: CardView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,9 +29,11 @@ class RestaurantConfigFragment : Fragment() {
 
         cardDelivery = myView?.findViewById(R.id.cardDelivery)
         cardCaja = myView?.findViewById(R.id.cardCaja)
+        cardMeseros = myView?.findViewById(R.id.cardMeseros)
 
         cardDelivery?.setOnClickListener { goToDeliveryConfig() }
         cardCaja?.setOnClickListener { goToBox() }
+        cardMeseros?.setOnClickListener { goToWaiters() }
 
         return myView
     }
@@ -41,6 +45,11 @@ class RestaurantConfigFragment : Fragment() {
 
     private fun goToBox(){
         val i = Intent(requireContext(), RestaurantConfigBoxActivity::class.java)
+        startActivity(i)
+    }
+
+    private fun goToWaiters(){
+        val i = Intent(requireContext(), RestaurantConfigWaiterActivity::class.java)
         startActivity(i)
     }
 

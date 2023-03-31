@@ -30,6 +30,12 @@ interface OrdersRoutes {
         @Header("Authorization") token: String
     ):Call<ArrayList<Order>>
 
+    @GET("orders/findByIdOrder/{id_order}")
+    fun getOrdersByIdOrder(
+        @Path("id_order") idOrder: String,
+        @Header("Authorization") token: String
+    ):Call<ArrayList<Order>>
+
     @POST("orders/create")
     fun create(
         @Body order: Order,

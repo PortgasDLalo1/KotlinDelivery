@@ -32,7 +32,7 @@ import com.example.easywaylocation.EasyWayLocation
 import com.example.easywaylocation.Listener
 import com.example.easywaylocation.draw_path.DirectionUtil
 import com.example.easywaylocation.draw_path.PolyLineDataBean
-import com.github.nkzawa.socketio.client.Socket
+//import com.github.nkzawa.socketio.client.Socket
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
 import com.maps.route.extensions.drawRouteOnMap
+import io.socket.client.Socket
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -77,7 +78,7 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Liste
 
     var distanceBetween = 0.0f
 
-    var socket: Socket? = null
+    var mSocket: Socket? = null
 
     private var wayPoints: ArrayList<LatLng> = ArrayList()
     private val WAY_POINT_TAG = "way_poiny_tag"
@@ -162,19 +163,22 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Liste
     }
 
     private fun emitPosition(){
+        mSocket = SocketHandler.getSocket()
         val data = SocketEmit(
             id_order = order?.id!!,
             lat = myLocationLatLng?.latitude!!,
             lng = myLocationLatLng?.longitude!!,
         )
 
-        socket?.emit("position",data.toJson())
+        mSocket!!.emit("position",data.toJson())
     }
 
     private fun connectSocket(){
         SocketHandler.setSocket()
-        socket = SocketHandler.getSocket()
-        socket?.connect()
+//        socket = SocketHandler.getSocket()
+//        socket?.connect()
+        SocketHandler.establishConnection()
+
     }
 
     override fun onDestroy() {
@@ -183,7 +187,7 @@ class DeliveryOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Liste
             fusedLocationClient?.removeLocationUpdates(locationCallback)
         }
 
-        socket?.disconnect()
+        mSocket?.disconnect()
         easyWayLocation?.endUpdates()
     }
 

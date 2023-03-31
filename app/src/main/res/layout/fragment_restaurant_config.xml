@@ -40,7 +40,7 @@
                 <ImageView
                     android:layout_width="100dp"
                     android:layout_height="110dp"
-                    android:src="@drawable/delivery"
+                    android:src="@drawable/repartidor"
                     android:scaleType="centerInside"
                     android:adjustViewBounds="true"
                     android:layout_marginBottom="5dp"/>
@@ -124,7 +124,7 @@
                 <ImageView
                     android:layout_width="100dp"
                     android:layout_height="110dp"
-                    android:src="@drawable/inventario"
+                    android:src="@drawable/mesero"
                     android:scaleType="centerInside"
                     android:adjustViewBounds="true"
                     android:layout_marginBottom="5dp"/>

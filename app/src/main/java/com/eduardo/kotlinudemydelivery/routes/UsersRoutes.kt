@@ -15,6 +15,11 @@ interface UsersRoutes {
         @Header("Authorization") token: String
     ):Call<ArrayList<User>>
 
+    @GET("users/findWaiter")
+    fun getWaiter(
+        @Header("Authorization") token: String
+    ):Call<ArrayList<User>>
+
     @POST("users/create")
     fun register(@Body user: User): Call<ResponseHttp>
 
@@ -23,6 +28,12 @@ interface UsersRoutes {
     fun registerDelivery(
         @Body user: User,
          @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
+    @POST("users/createWaiter")
+    fun registerWaiter(
+        @Body user: User,
+        @Header("Authorization") token: String
     ): Call<ResponseHttp>
 
     @FormUrlEncoded

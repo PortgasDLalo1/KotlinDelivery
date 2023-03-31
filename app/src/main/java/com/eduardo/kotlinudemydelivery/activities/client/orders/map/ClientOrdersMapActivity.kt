@@ -32,7 +32,7 @@ import com.example.easywaylocation.EasyWayLocation
 import com.example.easywaylocation.Listener
 import com.example.easywaylocation.draw_path.DirectionUtil
 import com.example.easywaylocation.draw_path.PolyLineDataBean
-import com.github.nkzawa.socketio.client.Socket
+//import com.github.nkzawa.socketio.client.Socket
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -41,6 +41,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
 import com.maps.route.extensions.drawRouteOnMap
+import io.socket.client.Socket
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -75,7 +76,7 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Listene
     var user: User? = null
     var sharedPref: SharedPref? = null
 
-    var socket: Socket? = null
+    var mSocket: Socket? = null
 
     private var easyWayLocation: EasyWayLocation? = null
 
@@ -150,10 +151,11 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Listene
 
     private fun connectSocket(){
         SocketHandler.setSocket()
-        socket = SocketHandler.getSocket()
-        socket?.connect()
-
-        socket?.on("position/${order?.id}"){args ->
+//        socket = SocketHandler.getSocket()
+//        socket?.connect()
+        SocketHandler.establishConnection()
+        mSocket = SocketHandler.getSocket()
+        mSocket?.on("position/${order?.id}"){args ->
             if (args[0] != null){
                 runOnUiThread{
                     val data = gson.fromJson(args[0].toString(), SocketEmit::class.java)
@@ -170,7 +172,7 @@ class ClientOrdersMapActivity : AppCompatActivity(), OnMapReadyCallback, Listene
             fusedLocationClient?.removeLocationUpdates(locationCallback)
         }
 
-        socket?.disconnect()
+        mSocket?.disconnect()
     }
 
     private fun goToHome(){

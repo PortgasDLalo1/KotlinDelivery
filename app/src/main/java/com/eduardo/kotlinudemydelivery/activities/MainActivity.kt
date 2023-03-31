@@ -19,6 +19,7 @@ import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.home.ClientHomeActivity
 import com.eduardo.kotlinudemydelivery.activities.delivery.home.DeliveryHomeActivity
 import com.eduardo.kotlinudemydelivery.activities.restaurant.home.RestaurantHomeActivity
+import com.eduardo.kotlinudemydelivery.activities.waiter.home.WaiterHomeActivity
 import com.eduardo.kotlinudemydelivery.databinding.ActivityMainBinding
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.User
@@ -99,6 +100,12 @@ class MainActivity : AppCompatActivity() {
         startActivity(i)
     }
 
+    private fun goToWaiterHome(){
+        val i = Intent(this, WaiterHomeActivity::class.java)
+        i.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK //eliminar historial de pantallas
+        startActivity(i)
+    }
+
     private fun goToSelectRol(){
         val i = Intent(this, SelectRolesActivity::class.java)
         i.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK //eliminar historial de pantallas
@@ -122,6 +129,8 @@ class MainActivity : AppCompatActivity() {
                 goToRestaurantHome()
             }else if (idRol == 3){
                 goToDeliveryHome()
+            }else if (idRol == 4){
+                goToWaiterHome()
             }
         }
     }
@@ -151,6 +160,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 else if (nameRol == "REPARTIDOR"){
                     goToDeliveryHome()
+                }
+                else if (nameRol == "MESERO"){
+                    goToWaiterHome()
                 }
             }
             else{

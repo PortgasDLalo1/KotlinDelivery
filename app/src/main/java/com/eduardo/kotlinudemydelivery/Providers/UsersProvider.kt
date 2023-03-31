@@ -70,12 +70,20 @@ class UsersProvider(val token: String? = null) {
         return usersRoutesToken?.getDelivery(token!!)
     }
 
+    fun getWaiter(): Call<ArrayList<User>>?{
+        return usersRoutesToken?.getWaiter(token!!)
+    }
+
     fun register(user: User): Call<ResponseHttp>? {
         return usersRoutes?.register(user)
     }
 
     fun registerDelivery(user: User): Call<ResponseHttp>? {
         return usersRoutes?.registerDelivery(user,token!!)
+    }
+
+    fun registerWaiter(user: User): Call<ResponseHttp>? {
+        return usersRoutes?.registerWaiter(user,token!!)
     }
     fun login(email: String, password: String): Call<ResponseHttp>? {
         return usersRoutes?.login(email, password)
