@@ -1,9 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".activities.client.card.list.ClientCardListActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <include layout="@layout/action_bar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="70dp"
+        android:layout_marginHorizontal="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Elige tu metodo de pago"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_card"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="25dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="10dp"/>
+
+        <TextView
+            android:id="@+id/abrirFormCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Agrega un metodo de pago"
+            android:layout_marginBottom="10dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/roboto_regular"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginBottom="20dp"/>
+        <Button
+            android:id="@+id/btn_nextCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Continuar"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/rounded_button"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="25dp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_card_create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add_simple"
+        app:backgroundTint="@color/green"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="100dp"
+        android:layout_marginRight="25dp"
+        android:contentDescription="address"
+        android:visibility="gone"/>
+
+    <View
+        android:id="@+id/view_transparent"
+        android:background="#52666666"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="370dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:cardElevation="10dp"
+        android:background="@color/white"
+        app:cardCornerRadius="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btnCerrarlayout"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_close"
+                android:layout_gravity="right"
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="15dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ingrese los datos de su tarjeta"
+                android:textColor="@color/black"
+                android:layout_marginHorizontal="20dp"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="20dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp">
+
+                <EditText
+                    android:id="@+id/edittext_number_card"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:hint="Numero de la tarjeta"
+                    android:background="@drawable/edittext_custom"
+                    android:padding="15dp"
+                    android:digits="0123456789 "
+                    android:inputType="number"
+                    android:maxLength="19"
+                    android:lines="1"/>
+
+                <ImageView
+                    android:id="@+id/imageView_icon_card"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/tarjeta"
+                    android:layout_marginHorizontal="10dp"/>
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edittext_propietario_card"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Nombre del propietario"
+                android:background="@drawable/edittext_custom"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:padding="15dp"
+                android:inputType="text"
+                android:lines="1"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edittext_expiration"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:hint="MM/YY"
+                    android:background="@drawable/edittext_custom"
+                    android:layout_margin="20dp"
+                    android:digits="0123456789/ "
+                    android:inputType="number"
+                    android:maxLength="5"
+                    android:padding="15dp"
+                    android:lines="1"/>
+
+                <EditText
+                    android:id="@+id/edittext_cvv"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:hint="cvv"
+                    android:background="@drawable/edittext_custom"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="20dp"
+                    android:padding="15dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="3"
+                    android:lines="1"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_create_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Agregar"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/rounded_button"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="20dp"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</RelativeLayout>

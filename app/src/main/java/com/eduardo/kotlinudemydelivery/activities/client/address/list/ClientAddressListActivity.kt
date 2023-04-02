@@ -14,6 +14,7 @@ import com.eduardo.kotlinudemydelivery.Providers.AddressProvider
 import com.eduardo.kotlinudemydelivery.Providers.OrdersProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.address.create.ClientAddressCreateActivity
+import com.eduardo.kotlinudemydelivery.activities.client.card.list.ClientCardListActivity
 import com.eduardo.kotlinudemydelivery.activities.client.payments.mercado_pago.form.ClientPaymentFormActivity
 import com.eduardo.kotlinudemydelivery.activities.client.payments.payment_method.ClientPaymentMethodActivity
 import com.eduardo.kotlinudemydelivery.adapters.AddressAdapter
@@ -109,7 +110,8 @@ class ClientAddressListActivity : AppCompatActivity() {
     }
 
     private fun goToPaymentsForm(){
-        val i = Intent(this, ClientPaymentMethodActivity::class.java)
+//        val i = Intent(this, ClientPaymentMethodActivity::class.java)
+        val i = Intent(this, ClientCardListActivity::class.java)
         startActivity(i)
     }
 
