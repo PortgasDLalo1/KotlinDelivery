@@ -23,6 +23,11 @@ interface SucursalesRoutes {
         @Header("Authorization") token: String
     ):Call<ResponseHttp>
 
+    @GET("sucursales/getRestaurants")
+    fun getSucursalesAll(
+        @Header("Authorization") token: String
+    ):Call<ArrayList<Sucursales>>
+
     @POST("sucursales/create")
     fun create(
         @Body sucursales: Sucursales,

@@ -1,39 +1,34 @@
 package com.eduardo.kotlinudemydelivery.activities.client.orders.checkout
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AppCompatActivity
+import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.databinding.ActivityClientOrderCheckOutBinding
+import com.eduardo.kotlinudemydelivery.models.Address
+import com.eduardo.kotlinudemydelivery.models.Sucursales
+import com.eduardo.kotlinudemydelivery.models.SucursalesDistance
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.example.easywaylocation.EasyWayLocation
 import com.example.easywaylocation.Listener
 import com.example.easywaylocation.draw_path.DirectionUtil
 import com.example.easywaylocation.draw_path.PolyLineDataBean
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,DirectionUtil.DirectionCallBack, Listener{
     private lateinit var binding: ActivityClientOrderCheckOutBinding
@@ -46,13 +41,14 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     var sharedPref: SharedPref? = null
     var user: User? = null
     private var easyWayLocation: EasyWayLocation? = null
-    val PERMISSION_ID = 42
-    var fusedLocationClient: FusedLocationProviderClient? = null
     var markerSucursal: Marker? = null
     var markerAddress: Marker? = null
-    var myLocationLatLng: LatLng? = null
     val TAG = "ClienteCard"
-
+    var sucursalesProvider: SucursalesProvider? = null
+    var address: Address? = null
+    var sessionLocation: LatLng? = null
+    var sucursalesDistance: ArrayList<SucursalesDistance>? = ArrayList()
+    var sucursales1: ArrayList<Sucursales>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityClientOrderCheckOutBinding.inflate(layoutInflater)
@@ -60,11 +56,12 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
 
         sharedPref = SharedPref(this)
         getUserFromSession()
-
+        sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
+        getAddressFromSession()
+        getSucursales()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map_check) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        getLastLocation()
+
 
         val locationRequest = LocationRequest.create().apply {
             interval = 0
@@ -73,25 +70,147 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
             smallestDisplacement = 1f
         }
         easyWayLocation = EasyWayLocation(this,locationRequest,false,false,this)
+
+
+
     }
 
-    private fun getUserFromSession(){
-        val gson = Gson()
-        if (!sharedPref?.getData("user").isNullOrBlank()){
-            //si el usuario exite en sesion
-            user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+    private fun getSucursales(){
+        sucursalesProvider?.getSucursalAll()?.enqueue(object: Callback<ArrayList<Sucursales>>{
+            override fun onResponse(
+                call: Call<ArrayList<Sucursales>>,
+                response: Response<ArrayList<Sucursales>>
+            ) {
+                if (response.body() != null){
+                    sucursales1 = response.body()
+//                    Log.d(TAG,sucursales1.toString())
+                    for (s in sucursales1!!){
+                        val sucLatLng = LatLng(s.lat,s.lng)
+                        val distance = getDistanceBetween(sucLatLng,sessionLocation!!)
+//                        Log.d(TAG,distance.toString())
+                        val sucu = SucursalesDistance(
+                            id = s.id,
+                            distance = distance,
+                            latlng = sucLatLng
+                        )
+                        sucursalesDistance?.add(sucu)
+                    }
+                    Log.d(TAG,"sucursales consulta"+sucursalesDistance.toString())
+                    getBetterDistanceSucursal(sucursalesDistance!!)
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<Sucursales>>, t: Throwable) {
+                Toast.makeText(this@ClientOrderCheckOutActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+
+        })
+    }
+
+    private fun getBetterDistanceSucursal(sucuDistance: ArrayList<SucursalesDistance>){
+        var max: Float = 0.0F
+        for (i in 0 until sucuDistance.size){
+            if (sucuDistance[i].distance!! > max){
+                max = sucuDistance[i].distance!!
+            }
         }
+
+        var min = max
+        var id = ""
+        var latLng: LatLng? = null
+        for (i in 0 until sucuDistance.size){
+            if (sucuDistance[i].distance!! < min){
+                min = sucuDistance[i].distance!!
+                id = sucuDistance[i].id!!
+                latLng = sucuDistance[i].latlng!!
+            }
+        }
+        sucursalesDistance?.clear()
+        val better = SucursalesDistance(
+            id = id,
+            distance = min,
+            latlng = latLng
+        )
+        sucursalesDistance?.add(better)
+        Log.d(TAG, "sucursalesDistance: "+sucursalesDistance)
+        drawOnMap(sucursalesDistance?.get(0)?.latlng!!)
+    }
+
+    private fun getDistanceBetween(fromLatLng: LatLng, toLatLng: LatLng): Float{
+
+        var distance = 0.0f
+        val from = Location("")
+        val to = Location("")
+
+        from.latitude = fromLatLng.latitude
+        from.longitude = fromLatLng.longitude
+        to.latitude = toLatLng.latitude
+        to.longitude = toLatLng.longitude
+
+        distance = from.distanceTo(to)
+
+        return distance
     }
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         googleMap?.uiSettings?.isZoomControlsEnabled = true
+
+    }
+
+    private fun drawOnMap(sd: LatLng){
+
+        //Log.d(TAG,"llego aqui"+sd)
+
+        addMyMarker(sessionLocation!!)
+        addSucursalMarker(sd)
+
+        var builder = LatLngBounds.Builder()
+        builder.include(markerAddress?.position!!)
+        builder.include(markerSucursal?.position!!)
+
+        var bounds = builder.build()
+        var width = resources.displayMetrics.widthPixels
+        var height = resources.displayMetrics.heightPixels
+        var padding = (width * 0.30).toInt()
+        var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
+        googleMap?.animateCamera(ca)
+//        googleMap?.moveCamera(
+//            CameraUpdateFactory.newCameraPosition(
+//                CameraPosition.builder().target(sessionLocation!!).zoom(13f).build()
+//            )
+//        )
+        easyDrawRoute()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        easyWayLocation?.endUpdates()
+    }
+
+    private fun easyDrawRoute(){
+        wayPoints.add(sucursalesDistance?.get(0)?.latlng!!)
+        wayPoints.add(sessionLocation!!)
+        directionUtil = DirectionUtil.Builder()
+            .setDirectionKey(resources.getString(R.string.google_map_api_key))
+            .setOrigin(sucursalesDistance?.get(0)?.latlng!!)
+            .setWayPoints(wayPoints)
+            .setGoogleMap(googleMap!!)
+            .setPolyLinePrimaryColor(R.color.black)
+            .setPolyLineWidth(10)
+            .setPathAnimation(true)
+            .setCallback(this)
+            .setDestination(sessionLocation!!)
+            .build()
+
+        directionUtil.initPath()
     }
 
     override fun pathFindFinish(
         polyLineDetailsMap: HashMap<String, PolyLineDataBean>,
         polyLineDetailsArray: ArrayList<PolyLineDataBean>
     ) {
+        directionUtil.drawPath(WAY_POINT_TAG)
 
     }
 
@@ -102,93 +221,21 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
             MarkerOptions()
                 .position(myMarker)
                 .title("Mi posicion")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.home))
-        )
-    }
-    @SuppressLint("MissingPermission")
-    private fun getLastLocation(){
-        Log.d(TAG,"LOCATION 1")
-        if (checkPermissions()){
-            Log.d(TAG,"LOCATION 2")
-            if (isLocationEnable()){
-                Log.d(TAG,"LOCATION 3")
-                fusedLocationClient?.lastLocation?.addOnCompleteListener { task ->
-
-                    var location = task.result
-                    Log.d(TAG,"LOCATION $location")
-                    if (location != null){
-                        myLocationLatLng = LatLng(location.latitude,location.longitude)
-                        Log.d(TAG,"LOCATION $myLocationLatLng")
-                        addMyMarker(myLocationLatLng!!)
-                        if (myLocationLatLng != null){
-                            googleMap?.moveCamera(
-                                CameraUpdateFactory.newCameraPosition(
-                                    CameraPosition.builder().target(
-                                        myLocationLatLng!!
-                                    ).zoom(15f).build()
-                                )
-                            )
-                        }
-                    }
-                }
-            }else {
-                Toast.makeText(this, "Habilita la localizacion", Toast.LENGTH_LONG).show()
-                val i = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                startActivity(i)
-            }
-        } else{
-            requestPermissions()
-        }
-    }
-
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ),
-            PERMISSION_ID
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.house))
         )
     }
 
-    private fun isLocationEnable(): Boolean {
-        var locationManager: LocationManager =
-            getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
+    private fun addSucursalMarker(Location: LatLng){
+        val myMarker = LatLng(Location.latitude,Location.longitude)
+
+        markerSucursal = googleMap?.addMarker(
+            MarkerOptions()
+                .position(myMarker)
+                .title("Sushi & Bar 31")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant))
         )
     }
 
-    private fun checkPermissions(): Boolean {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            return true
-        }
-
-        return false
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == PERMISSION_ID) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getLastLocation()
-            }
-        }
-    }
 
     override fun locationOn() {
 
@@ -198,5 +245,22 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     }
 
     override fun locationCancelled() {
+    }
+    private fun getUserFromSession(){
+        val gson = Gson()
+        if (!sharedPref?.getData("user").isNullOrBlank()){
+            //si el usuario exite en sesion
+            user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+        }
+    }
+    private fun getAddressFromSession(){
+        if (!sharedPref?.getData("address").isNullOrBlank()){
+            address = gson.fromJson(sharedPref?.getData("address"), Address::class.java) // si existe una direccion
+            sessionLocation = LatLng(address?.lat!!,address?.lng!!)
+            Log.d(TAG,"getAddressFromSession $sessionLocation")
+            if (sessionLocation!= null){
+                Log.d(TAG, "SESSION"+sessionLocation.toString())
+            }
+        }
     }
 }

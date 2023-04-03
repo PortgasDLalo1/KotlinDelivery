@@ -9,16 +9,14 @@
     <fragment
         android:id="@+id/map_check"
         android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        />
+        android:layout_height="250dp"
+        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="230dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_gravity="bottom">
-
-
+        android:layout_marginTop="250dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,6 +30,15 @@
         </LinearLayout>
 
     </LinearLayout>
+
+<!--    <ImageView-->
+<!--        android:id="@+id/imageViewBack"-->
+<!--        android:layout_width="35dp"-->
+<!--        android:layout_height="35dp"-->
+<!--        android:src="@drawable/ic_arrow_left"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:layout_marginStart="15dp"-->
+<!--        android:contentDescription="hola" />-->
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

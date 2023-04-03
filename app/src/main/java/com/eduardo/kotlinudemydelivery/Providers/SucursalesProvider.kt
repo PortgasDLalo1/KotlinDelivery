@@ -27,6 +27,9 @@ class SucursalesProvider(val token: String) {
         return sucursalesRoutes?.getSucursales(idRestaurant,token)
     }
 
+    fun getSucursalAll(): Call<ArrayList<Sucursales>>?{
+        return sucursalesRoutes?.getSucursalesAll(token)
+    }
     fun create(sucursal: Sucursales): Call<ResponseHttp>? {
         return  sucursalesRoutes?.create(sucursal, token)
     }

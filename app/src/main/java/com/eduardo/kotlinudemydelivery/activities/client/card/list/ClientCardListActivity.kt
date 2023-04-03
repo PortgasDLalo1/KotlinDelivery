@@ -120,7 +120,7 @@ class ClientCardListActivity : AppCompatActivity() {
 
                 if (s?.length == 1){
                     val primero = s.get(0)
-                    Log.d(TAG,"primer digito:  ${primero}")
+//                    Log.d(TAG,"primer digito:  ${primero}")
                     if (primero == '5'){
                         binding.imageViewIconCard.setImageResource(R.drawable.mastercard)
                     } else if(primero == '4'){
@@ -188,7 +188,7 @@ class ClientCardListActivity : AppCompatActivity() {
         val expiration = edittextExpiration?.text.toString()
         val name = binding.edittextPropietarioCard?.text.toString()
         val cvv = binding.edittextCvv?.text.toString()
-        Log.d(TAG, "NUMBER CARD $numberCard")
+//        Log.d(TAG, "NUMBER CARD $numberCard")
         if (isValidForm(numberCard,expiration,name,cvv)){
             val card = Cards(
                 id_client =  user?.id,
@@ -213,7 +213,7 @@ class ClientCardListActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
                     Toast.makeText(this@ClientCardListActivity, "Se produjo un error ${t.message}", Toast.LENGTH_LONG).show()
-                Log.d(TAG,"ERROR: ${t.message}")
+                    Log.d(TAG,"ERROR: ${t.message}")
                }
 
             })
@@ -232,7 +232,7 @@ class ClientCardListActivity : AppCompatActivity() {
         if (!sharedPref?.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
-            Log.e(TAG, "Usuario: $user")
+//            Log.e(TAG, "Usuario: $user")
         }
     }
 
@@ -278,7 +278,7 @@ class ClientCardListActivity : AppCompatActivity() {
                         number_card = "Efectivo"
                     )
                     cards.add(efectivo)
-                    Log.d(TAG,"Error: ${cards}")
+//                    Log.d(TAG,"Error: ${cards}")
                     adapter = CardAdapter(this@ClientCardListActivity,cards)
                     binding.recyclerviewCard.adapter = adapter
                 }

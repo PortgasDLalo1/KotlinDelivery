@@ -40,7 +40,7 @@ class CardAdapter(val context: Activity, val cards: ArrayList<Cards>): RecyclerV
             val ultimo4 = card.number_card?.substring(15)
             val primerDigito = card.number_card?.substring(0, 1)
             holder.textNumberCard.text = "**** $ultimo4"
-            Log.d(TAG, "$primerDigito")
+//            Log.d(TAG, "$primerDigito")
             if (primerDigito == "5") {
                 holder.imageCard.setImageResource(R.drawable.mastercard)
             } else if (primerDigito == "4") {
