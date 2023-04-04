@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName
 class SucursalesDistance(
     @SerializedName("id") val id: String? = null,
     @SerializedName("distance") val distance: Float? = null,
+    @SerializedName("neighborhood") val neighborhood: String? = null,
     @SerializedName("latlng") val latlng: LatLng? = null
 ) {
 

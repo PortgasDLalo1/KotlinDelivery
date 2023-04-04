@@ -1,17 +1,23 @@
 package com.eduardo.kotlinudemydelivery.activities.client.orders.checkout
 
+import android.content.Intent
+import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.client.address.list.ClientAddressListActivity
+import com.eduardo.kotlinudemydelivery.activities.client.card.list.ClientCardListActivity
+import com.eduardo.kotlinudemydelivery.adapters.CheckOutPAdapter
+import com.eduardo.kotlinudemydelivery.adapters.ShoppingBagAdapter
 import com.eduardo.kotlinudemydelivery.databinding.ActivityClientOrderCheckOutBinding
-import com.eduardo.kotlinudemydelivery.models.Address
-import com.eduardo.kotlinudemydelivery.models.Sucursales
-import com.eduardo.kotlinudemydelivery.models.SucursalesDistance
-import com.eduardo.kotlinudemydelivery.models.User
+import com.eduardo.kotlinudemydelivery.models.*
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.example.easywaylocation.EasyWayLocation
 import com.example.easywaylocation.Listener
@@ -26,14 +32,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Integer.min
 
 class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,DirectionUtil.DirectionCallBack, Listener{
     private lateinit var binding: ActivityClientOrderCheckOutBinding
     var googleMap: GoogleMap? = null
-
+    var toolbar: Toolbar? = null
     var wayPoints: ArrayList<LatLng> = ArrayList()
     val WAY_POINT_TAG = "way_point_tag"
     private lateinit var directionUtil: DirectionUtil
@@ -49,6 +57,9 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     var sessionLocation: LatLng? = null
     var sucursalesDistance: ArrayList<SucursalesDistance>? = ArrayList()
     var sucursales1: ArrayList<Sucursales>? = null
+    var selectedProducts = ArrayList<Product>()
+    var adapterProduct: CheckOutPAdapter? = null
+    var cardSession: Cards? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityClientOrderCheckOutBinding.inflate(layoutInflater)
@@ -59,6 +70,9 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
         getAddressFromSession()
         getSucursales()
+        binding.recyclerviewCheck.layoutManager = LinearLayoutManager(this)
+        getProductsFromSharedPref()
+        getCardsFromSharedPref()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map_check) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
@@ -71,8 +85,35 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         }
         easyWayLocation = EasyWayLocation(this,locationRequest,false,false,this)
 
+        toolbar = findViewById(R.id.toolbar)
+        toolbar?.setTitleTextColor(ContextCompat.getColor(this,R.color.black))
+        toolbar?.title = "Pedido"
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        binding.layoutAddressCheck.setOnClickListener { goToAddressList() }
+
+        binding.layoutCardCheck.setOnClickListener { goToCardList() }
 
 
+    }
+
+    private fun goToCardList(){
+        val i = Intent(this,ClientCardListActivity::class.java)
+        startActivity(i)
+    }
+
+    private fun goToAddressList(){
+        val i = Intent(this,ClientAddressListActivity::class.java)
+        startActivity(i)
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        getAddressFromSession()
+        getCardsFromSharedPref()
+        getSucursales()
     }
 
     private fun getSucursales(){
@@ -91,6 +132,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
                         val sucu = SucursalesDistance(
                             id = s.id,
                             distance = distance,
+                            neighborhood = s.neighborhood,
                             latlng = sucLatLng
                         )
                         sucursalesDistance?.add(sucu)
@@ -118,22 +160,26 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         var min = max
         var id = ""
         var latLng: LatLng? = null
+        var neigh = ""
         for (i in 0 until sucuDistance.size){
             if (sucuDistance[i].distance!! < min){
                 min = sucuDistance[i].distance!!
                 id = sucuDistance[i].id!!
                 latLng = sucuDistance[i].latlng!!
+                neigh = sucuDistance[i].neighborhood!!
             }
         }
         sucursalesDistance?.clear()
         val better = SucursalesDistance(
             id = id,
             distance = min,
+            neighborhood = neigh,
             latlng = latLng
         )
         sucursalesDistance?.add(better)
         Log.d(TAG, "sucursalesDistance: "+sucursalesDistance)
         drawOnMap(sucursalesDistance?.get(0)?.latlng!!)
+        binding.textViewNameRestaurant.text = "31 Sushi & Bar(${sucursalesDistance?.get(0)!!.neighborhood})"
     }
 
     private fun getDistanceBetween(fromLatLng: LatLng, toLatLng: LatLng): Float{
@@ -161,7 +207,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     private fun drawOnMap(sd: LatLng){
 
         //Log.d(TAG,"llego aqui"+sd)
-
+        googleMap?.clear()
         addMyMarker(sessionLocation!!)
         addSucursalMarker(sd)
 
@@ -169,12 +215,35 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         builder.include(markerAddress?.position!!)
         builder.include(markerSucursal?.position!!)
 
-        var bounds = builder.build()
-        var width = resources.displayMetrics.widthPixels
-        var height = resources.displayMetrics.heightPixels
-        var padding = (width * 0.30).toInt()
+        var bounds: LatLngBounds? = null
+        var width = 0
+        var height = 0
+        var padding = 0
+        /*if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            bounds = builder.build()
+            width = resources.displayMetrics.widthPixels
+            height = resources.displayMetrics.heightPixels
+            padding = (width * 0.40).toInt()
+            var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
+            googleMap?.animateCamera(ca)
+        }else{
+            bounds = builder.build()
+            width = resources.displayMetrics.widthPixels
+            height = resources.displayMetrics.heightPixels
+            padding = (width * 0.40).toInt()
+            var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
+            googleMap?.animateCamera(ca)
+        }*/
+
+        bounds = builder.build()
+        width = resources.displayMetrics.widthPixels
+        height = resources.displayMetrics.heightPixels
+        val minMetric = min(width,height)
+        padding = minMetric.div(3)
         var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
         googleMap?.animateCamera(ca)
+
+
 //        googleMap?.moveCamera(
 //            CameraUpdateFactory.newCameraPosition(
 //                CameraPosition.builder().target(sessionLocation!!).zoom(13f).build()
@@ -189,6 +258,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     }
 
     private fun easyDrawRoute(){
+        wayPoints.clear()
         wayPoints.add(sucursalesDistance?.get(0)?.latlng!!)
         wayPoints.add(sessionLocation!!)
         directionUtil = DirectionUtil.Builder()
@@ -231,7 +301,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         markerSucursal = googleMap?.addMarker(
             MarkerOptions()
                 .position(myMarker)
-                .title("Sushi & Bar 31")
+                .title("31 Sushi & Bar\n ${sucursalesDistance?.get(0)?.neighborhood}")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant))
         )
     }
@@ -246,11 +316,17 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
 
     override fun locationCancelled() {
     }
+
+    fun setTotalCheck(total: Double){
+        binding.textviewTotalPriceCheck.text = "$ ${total} MX"
+    }
     private fun getUserFromSession(){
         val gson = Gson()
         if (!sharedPref?.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+            binding.textViewNameClientCheck.text = "${user?.name} ${user?.lastname}"
+            binding.textViewPhoneClientCheck.text = "${user?.phone}"
         }
     }
     private fun getAddressFromSession(){
@@ -261,6 +337,41 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
             if (sessionLocation!= null){
                 Log.d(TAG, "SESSION"+sessionLocation.toString())
             }
+
+            binding.textViewAddressCheck.text = "${address?.address}, ${address?.neighborhood}"
+        }
+    }
+
+    private fun getProductsFromSharedPref(){
+        if (!sharedPref?.getData("order").isNullOrBlank()){ // si existe una orden en sharedpref
+            val type = object: TypeToken<ArrayList<Product>>() {}.type
+            selectedProducts = gson.fromJson(sharedPref?.getData("order"), type)
+            adapterProduct = CheckOutPAdapter(this, selectedProducts)
+            binding.recyclerviewCheck.adapter = adapterProduct
+        }
+    }
+
+    private fun getCardsFromSharedPref(){
+        if(!sharedPref?.getData("card").isNullOrBlank()){
+            cardSession =  gson.fromJson(sharedPref?.getData("card"), Cards::class.java)
+            if(cardSession?.number_card == "Efectivo"){
+                binding.textviewCard.text = cardSession?.number_card
+                binding.imageViewIconCard.setImageResource(R.drawable.efectivo)
+            }else {
+                val ultimo4 = cardSession?.number_card?.substring(15)
+                val primerDigito = cardSession?.number_card?.substring(0, 1)
+                binding.textviewCard.text = "**** $ultimo4"
+                if (primerDigito == "5") {
+                    binding.imageViewIconCard.setImageResource(R.drawable.mastercard)
+                } else if (primerDigito == "4") {
+                    binding.imageViewIconCard.setImageResource(R.drawable.visa)
+                } else if (primerDigito == "4") {
+                    binding.imageViewIconCard.setImageResource(R.drawable.american_express)
+                } else {
+                    binding.imageViewIconCard.setImageResource(R.drawable.tarjeta)
+                }
+            }
+
         }
     }
 }

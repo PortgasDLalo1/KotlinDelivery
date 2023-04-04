@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.address.create.ClientAddressCreateActivity
 import com.eduardo.kotlinudemydelivery.activities.client.address.list.ClientAddressListActivity
+import com.eduardo.kotlinudemydelivery.activities.client.orders.checkout.ClientOrderCheckOutActivity
 import com.eduardo.kotlinudemydelivery.adapters.ShoppingBagAdapter
 import com.eduardo.kotlinudemydelivery.databinding.ActivityClientShoppingBagBinding
 import com.eduardo.kotlinudemydelivery.models.Product
@@ -54,7 +55,7 @@ class ClientShoppingBagActivity : AppCompatActivity() {
     }
 
     private fun goToAddressList(){
-        val i = Intent(this, ClientAddressListActivity::class.java)
+        val i = Intent(this, ClientOrderCheckOutActivity::class.java)
         startActivity(i)
     }
 

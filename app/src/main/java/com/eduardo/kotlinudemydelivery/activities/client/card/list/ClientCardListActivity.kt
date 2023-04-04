@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -18,6 +19,7 @@ import com.eduardo.kotlinudemydelivery.Providers.CardsProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.adapters.CardAdapter
 import com.eduardo.kotlinudemydelivery.databinding.ActivityClientCardListBinding
+import com.eduardo.kotlinudemydelivery.models.Address
 import com.eduardo.kotlinudemydelivery.models.Cards
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.User
@@ -90,10 +92,20 @@ class ClientCardListActivity : AppCompatActivity() {
         validExpirationCard()
 //        edittextNumberCard?.setOnClickListener {  binding.linear.translationY =  trescuartos.toFloat()}
         binding.btnCreateCard.setOnClickListener { createCard() }
-
+        binding.btnNextCard.setOnClickListener { getCardFromSession() }
         getCardsByUser(user?.id!!)
     }
 
+    private fun getCardFromSession(){
+        if (!sharedPref?.getData("card").isNullOrBlank()){
+            val a = gson.fromJson(sharedPref?.getData("card"), Address::class.java) // si existe una direccion
+            //goToPaymentsForm()
+            finish()
+            //createOrder(a.id!!)
+        }else{
+            Toast.makeText(this, "Selecciona una direccion para continuar", Toast.LENGTH_LONG).show()
+        }
+    }
     private fun animateLayout(y: Float, destino: Float, alfa: Float) {
         binding.linear.translationY =y
         binding.linear.animate()
@@ -274,7 +286,9 @@ class ClientCardListActivity : AppCompatActivity() {
             ) {
                 if (response.body() != null){
                     val cards = response.body()!!
+                    val idcard = (cards.size + 1).toString()
                     val efectivo = Cards(
+                        id = idcard,
                         number_card = "Efectivo"
                     )
                     cards.add(efectivo)
@@ -289,6 +303,13 @@ class ClientCardListActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    fun resetValue(position: Int){
+        val viewHolder = binding.recyclerviewCard.findViewHolderForAdapterPosition(position)
+        val view = viewHolder?.itemView
+        val imageViewCheck = view?.findViewById<ImageView>(R.id.imageview_check_card)
+        imageViewCheck?.visibility = View.GONE
     }
 
 }

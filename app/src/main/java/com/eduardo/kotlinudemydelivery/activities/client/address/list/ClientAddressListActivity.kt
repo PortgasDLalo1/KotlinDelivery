@@ -102,7 +102,8 @@ class ClientAddressListActivity : AppCompatActivity() {
     private fun getAddressFromSession(){
         if (!sharedPref?.getData("address").isNullOrBlank()){
             val a = gson.fromJson(sharedPref?.getData("address"),Address::class.java) // si existe una direccion
-            goToPaymentsForm()
+            //goToPaymentsForm()
+            finish()
             //createOrder(a.id!!)
         }else{
             Toast.makeText(this, "Selecciona una direccion para continuar", Toast.LENGTH_LONG).show()
