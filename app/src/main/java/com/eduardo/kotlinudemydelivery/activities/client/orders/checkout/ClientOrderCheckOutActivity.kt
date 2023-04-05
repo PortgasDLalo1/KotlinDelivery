@@ -5,10 +5,12 @@ import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.R
@@ -68,11 +70,11 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         sharedPref = SharedPref(this)
         getUserFromSession()
         sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
-        getAddressFromSession()
-        getSucursales()
+//        getAddressFromSession()
+//        getSucursales()
         binding.recyclerviewCheck.layoutManager = LinearLayoutManager(this)
-        getProductsFromSharedPref()
-        getCardsFromSharedPref()
+//        getProductsFromSharedPref()
+//        getCardsFromSharedPref()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map_check) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
@@ -93,7 +95,10 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
 
         binding.layoutAddressCheck.setOnClickListener { goToAddressList() }
 
-        binding.layoutCardCheck.setOnClickListener { goToCardList() }
+        binding.layoutCardCheck.setOnClickListener {
+            binding.edittextCvvCheck?.setText("")
+            goToCardList()
+        }
 
 
     }
@@ -111,9 +116,11 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
 
     override fun onResume() {
         super.onResume()
+        getProductsFromSharedPref()
         getAddressFromSession()
         getCardsFromSharedPref()
         getSucursales()
+
     }
 
     private fun getSucursales(){
@@ -178,7 +185,8 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         )
         sucursalesDistance?.add(better)
         Log.d(TAG, "sucursalesDistance: "+sucursalesDistance)
-        drawOnMap(sucursalesDistance?.get(0)?.latlng!!)
+//        getAddressFromSession()
+        drawOnMap(sucursalesDistance?.get(0)?.latlng!!, sessionLocation!!)
         binding.textViewNameRestaurant.text = "31 Sushi & Bar(${sucursalesDistance?.get(0)!!.neighborhood})"
     }
 
@@ -204,11 +212,11 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
 
     }
 
-    private fun drawOnMap(sd: LatLng){
+    private fun drawOnMap(sd: LatLng, sa: LatLng){
 
         //Log.d(TAG,"llego aqui"+sd)
         googleMap?.clear()
-        addMyMarker(sessionLocation!!)
+        addMyMarker(sa)
         addSucursalMarker(sd)
 
         var builder = LatLngBounds.Builder()
@@ -239,7 +247,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         width = resources.displayMetrics.widthPixels
         height = resources.displayMetrics.heightPixels
         val minMetric = min(width,height)
-        padding = minMetric.div(3)
+        padding = minMetric.div(4)
         var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
         googleMap?.animateCamera(ca)
 
@@ -357,6 +365,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
             if(cardSession?.number_card == "Efectivo"){
                 binding.textviewCard.text = cardSession?.number_card
                 binding.imageViewIconCard.setImageResource(R.drawable.efectivo)
+                binding.cardviewCvv?.visibility = View.GONE
             }else {
                 val ultimo4 = cardSession?.number_card?.substring(15)
                 val primerDigito = cardSession?.number_card?.substring(0, 1)
@@ -370,6 +379,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
                 } else {
                     binding.imageViewIconCard.setImageResource(R.drawable.tarjeta)
                 }
+                binding.cardviewCvv?.visibility = View.VISIBLE
             }
 
         }
