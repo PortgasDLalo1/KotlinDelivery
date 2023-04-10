@@ -80,7 +80,8 @@ class ClientPaymentsInstallmentsActivity : AppCompatActivity() {
         val order = Order(
             products = selectedProducts,
             id_client = user?.id!!,
-            id_address = address?.id!!
+            id_address = address?.id!!,
+            installments_type = ""
         )
 
         val payer = Payer(

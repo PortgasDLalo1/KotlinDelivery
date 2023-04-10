@@ -79,7 +79,8 @@ class ClientAddressListActivity : AppCompatActivity() {
         val order = Order(
             products = selectedProducts,
             id_client = user?.id!!,
-            id_address = idAddress
+            id_address = idAddress,
+            installments_type = ""
         )
 
         ordersProvider?.create(order)?.enqueue(object: Callback<ResponseHttp>{

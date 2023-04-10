@@ -9,11 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.MainActivity
 import com.eduardo.kotlinudemydelivery.activities.SelectRolesActivity
+import com.eduardo.kotlinudemydelivery.activities.client.address.list.ClientAddressListActivity
 import com.eduardo.kotlinudemydelivery.activities.client.update.ClientUpdateActivity
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
@@ -29,6 +32,7 @@ class ClientProfileFragment : Fragment() {
     var textViewName: TextView? = null
     var textViewEmail: TextView? = null
     var textViewPhone: TextView? = null
+    var linearLayoutAddress: LinearLayout? = null
     var imageViewLogout: ImageView? = null
 
     var sharedPref: SharedPref? = null
@@ -47,6 +51,7 @@ class ClientProfileFragment : Fragment() {
         textViewName = myView?.findViewById(R.id.textview_name)
         textViewEmail = myView?.findViewById(R.id.textview_email)
         textViewPhone = myView?.findViewById(R.id.textview_phone)
+        linearLayoutAddress = myView?.findViewById(R.id.linearLayout_addressP)
         circleImageUser = myView?.findViewById(R.id.circleimage_user)
         imageViewLogout = myView?.findViewById(R.id.imageview_logout)
 
@@ -70,8 +75,20 @@ class ClientProfileFragment : Fragment() {
         }else{
             buttonSelectRol?.visibility = View.VISIBLE
         }
+        val nameRol = user?.roles?.get(0)?.name
+        if (nameRol == "CLIENTE"){
+            linearLayoutAddress?.visibility = View.VISIBLE
+        }
+
+
+        linearLayoutAddress?.setOnClickListener { goToAddress() }
 
         return myView
+    }
+
+    private fun goToAddress() {
+        val i = Intent(requireContext(),ClientAddressListActivity::class.java)
+        startActivity(i)
     }
 
     private fun getUserFromSession(){

@@ -4,18 +4,27 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.eduardo.kotlinudemydelivery.Providers.MercadoPagoProvider
+import com.eduardo.kotlinudemydelivery.Providers.PaymentsProvider
 import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.address.list.ClientAddressListActivity
 import com.eduardo.kotlinudemydelivery.activities.client.card.list.ClientCardListActivity
+import com.eduardo.kotlinudemydelivery.activities.client.payments.mercado_pago.installments.ClientPaymentsInstallmentsActivity
+import com.eduardo.kotlinudemydelivery.activities.client.payments.mercado_pago.status.ClientPaymentsStatusActivity
 import com.eduardo.kotlinudemydelivery.adapters.CheckOutPAdapter
 import com.eduardo.kotlinudemydelivery.adapters.ShoppingBagAdapter
 import com.eduardo.kotlinudemydelivery.databinding.ActivityClientOrderCheckOutBinding
@@ -34,7 +43,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -62,6 +74,22 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     var selectedProducts = ArrayList<Product>()
     var adapterProduct: CheckOutPAdapter? = null
     var cardSession: Cards? = null
+
+    var cardNumberG = ""
+    var cardHolder = ""
+    var cardExpiration = ""
+    var cardCvv = ""
+    var mercadoPagoProvider: MercadoPagoProvider = MercadoPagoProvider()
+    var paymentsProvider: PaymentsProvider? = null
+
+    var edittextCvvCheck: EditText ?=null
+    var paymentMethodId = ""
+    var paymentTypeId = ""
+    var issuerId = ""
+    var cardToken = ""
+    var firstSixDigits = ""
+    var total = 0.0
+    var installmentsSelected = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityClientOrderCheckOutBinding.inflate(layoutInflater)
@@ -70,9 +98,11 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         sharedPref = SharedPref(this)
         getUserFromSession()
         sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
-//        getAddressFromSession()
+        paymentsProvider = PaymentsProvider(user?.sessionToken!!)
+        //
 //        getSucursales()
         binding.recyclerviewCheck.layoutManager = LinearLayoutManager(this)
+        edittextCvvCheck = findViewById(R.id.edittext_cvv_check)
 //        getProductsFromSharedPref()
 //        getCardsFromSharedPref()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map_check) as? SupportMapFragment
@@ -96,11 +126,14 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         binding.layoutAddressCheck.setOnClickListener { goToAddressList() }
 
         binding.layoutCardCheck.setOnClickListener {
-            binding.edittextCvvCheck?.setText("")
+            edittextCvvCheck?.setText("")
             goToCardList()
         }
 
+        validCvvInput()
+        binding.cardviewInstallment.visibility = View.GONE
 
+        binding.btnPay?.setOnClickListener { createPayment() }
     }
 
     private fun goToCardList(){
@@ -120,7 +153,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         getAddressFromSession()
         getCardsFromSharedPref()
         getSucursales()
-
+        Log.d(TAG,"entra aqui")
     }
 
     private fun getSucursales(){
@@ -134,6 +167,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
 //                    Log.d(TAG,sucursales1.toString())
                     for (s in sucursales1!!){
                         val sucLatLng = LatLng(s.lat,s.lng)
+                        Log.d(TAG,"sesion location"+sessionLocation.toString())
                         val distance = getDistanceBetween(sucLatLng,sessionLocation!!)
 //                        Log.d(TAG,distance.toString())
                         val sucu = SucursalesDistance(
@@ -247,7 +281,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         width = resources.displayMetrics.widthPixels
         height = resources.displayMetrics.heightPixels
         val minMetric = min(width,height)
-        padding = minMetric.div(4)
+        padding = minMetric.div(3)
         var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
         googleMap?.animateCamera(ca)
 
@@ -325,8 +359,9 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     override fun locationCancelled() {
     }
 
-    fun setTotalCheck(total: Double){
-        binding.textviewTotalPriceCheck.text = "$ ${total} MX"
+    fun setTotalCheck(totalA: Double){
+        total = totalA
+        binding.textviewTotalPriceCheck.text = "$ ${totalA} MX"
     }
     private fun getUserFromSession(){
         val gson = Gson()
@@ -380,8 +415,189 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
                     binding.imageViewIconCard.setImageResource(R.drawable.tarjeta)
                 }
                 binding.cardviewCvv?.visibility = View.VISIBLE
+
+                cardNumberG = cardSession?.number_card!!
+                cardExpiration = cardSession?.expiration!!
+                cardHolder = cardSession?.name_client!!
             }
 
         }
+    }
+
+    private fun createCardToken(){
+
+        val expiration = cardExpiration.split("/").toTypedArray()
+        val month = expiration[0]
+        val year = "20${expiration[1]}"
+        val ch = Cardholder(name = cardHolder)
+
+        cardNumberG = cardNumberG.replace(" ","")
+
+        val mercadoPagoCardTokenBody = MercadoPagoCardTokenBody(
+            securityCode = edittextCvvCheck?.text.toString(),
+            expirationYear = year,
+            expirationMonth = month.toInt(),
+            cardNumber = cardNumberG,
+            cardHolder = ch
+        )
+
+        Log.d(TAG, "$mercadoPagoCardTokenBody")
+
+        mercadoPagoProvider.createCardToken(mercadoPagoCardTokenBody)?.enqueue(object : Callback<JsonObject>{
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+               if (response.body()!=null){
+                   cardToken = response.body()?.get("id")?.asString!!
+                   firstSixDigits = response.body()?.get("first_six_digits")?.asString!!
+                  // goToInstallments(cardToken!!,firstSixDigits!!)
+                   getInstallments()
+                   Log.d(TAG,"Cardtoken: $cardToken,  First: $firstSixDigits")
+               }
+            }
+
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Toast.makeText(this@ClientOrderCheckOutActivity, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+            }
+
+        })
+    }
+
+    private fun validCvvInput(){
+        edittextCvvCheck?.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+               if (s?.length == 3){
+                   Log.d(TAG, "son 3")
+                   createCardToken()
+               }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
+    }
+
+    private fun getInstallments(){
+        mercadoPagoProvider.getInstallments(firstSixDigits,"$total")?.enqueue(object : Callback<JsonArray>{
+            override fun onResponse(call: Call<JsonArray>, response: Response<JsonArray>) {
+                if (response.body() != null){
+                    val jsonInstallments = response.body()!!.get(0).asJsonObject.get("payer_costs").asJsonArray
+
+                    val type = object: TypeToken<ArrayList<MercadoPagoInstallments>>(){}.type
+                    val installments = gson.fromJson<ArrayList<MercadoPagoInstallments>>(jsonInstallments, type)
+
+                    paymentMethodId = response.body()?.get(0)?.asJsonObject?.get("payment_method_id")?.asString!!
+                    paymentTypeId = response.body()?.get(0)?.asJsonObject?.get("payment_type_id")?.asString!!
+                    issuerId = response.body()?.get(0)?.asJsonObject?.get("issuer")?.asJsonObject?.get("id")?.asString!!
+
+                    Log.d(TAG, "response: $response")
+                    Log.d(TAG, "installments: $installments")
+                    Log.d(TAG, "paymentMethodId: $paymentMethodId")
+                    Log.d(TAG, "paymentTypeId: $paymentTypeId")
+
+                    if (paymentTypeId=="credit_card"){
+                        binding.cardviewInstallment.visibility = View.VISIBLE
+                        Log.d(TAG, "entrar")
+                    }else{
+                        binding.cardviewInstallment.visibility = View.GONE
+                    }
+                    val arrayAdapter = ArrayAdapter<MercadoPagoInstallments>(this@ClientOrderCheckOutActivity, android.R.layout.simple_dropdown_item_1line, installments)
+                    binding.spinnerInstallmentsCheck?.adapter = arrayAdapter
+                    binding.spinnerInstallmentsCheck?.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+                        override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, l: Long) {
+                            installmentsSelected = "${installments[position].installments}"
+                            Log.d(TAG,"Coutas seleccionadas: $installmentsSelected")
+                            binding.textviewDescriptionCheck.text = installments[position].recommendedMessage
+                        }
+
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<JsonArray>, t: Throwable) {
+
+            }
+
+        })
+    }
+
+    private fun createPayment(){
+        Log.d(TAG,"Create $paymentTypeId")
+        val order = Order(
+            products = selectedProducts,
+            id_client = user?.id!!,
+            id_address = address?.id!!,
+            id_restaurant =  sucursalesDistance?.get(0)?.id,
+            installments_type = paymentTypeId.toString()!!
+        )
+
+        val payer = Payer(
+            email = user?.email!!
+        )
+
+        val mercadoPagoPayment = MercadoPagoPayment(
+            order = order,
+            token = cardToken,
+            description = "Kotlin Delivery",
+            paymentMethodId = paymentMethodId,
+            paymentTypeId = paymentTypeId,
+            issuerId = issuerId,
+            payer = payer,
+            transactionAmount = total,
+            installments = installmentsSelected.toInt()
+        )
+
+        ProgressDialogFragment.showProgressBar(this)
+
+        paymentsProvider?.create(mercadoPagoPayment)?.enqueue(object : Callback<ResponseHttp>{
+            override fun onResponse(call: Call<ResponseHttp>, response: Response<ResponseHttp>) {
+                ProgressDialogFragment.hideProgressBar(this@ClientOrderCheckOutActivity)
+                if (response.body()!=null){
+                    if (response.body()?.isSuccess== true){
+                        sharedPref?.remove("order")
+                    }
+                    Toast.makeText(this@ClientOrderCheckOutActivity, response.body()?.message, Toast.LENGTH_LONG)
+                        .show()
+
+                    val status = response.body()?.data?.get("dataPayment")?.asJsonObject?.get("status")?.asString
+                    //Log.d(TAG, "Response body: ${response.body()?.data?.get("id_order")?.asString}")
+//                    val lastFour = response.body()?.data?.get("card")?.asJsonObject?.get("last_four_digits")?.asString
+                    val lastFour = response.body()?.data?.get("dataPayment")?.asJsonObject?.get("card")?.asJsonObject?.get("last_four_digits")?.asString
+                    val idOrder = response.body()?.data?.get("id_order")?.asString
+                    //Log.d(TAG, "Response body: ${response.body()?.data?.get("id_order")?.asString} status: $status lastfour: $lastFour")
+                    goToPaymentsStatus(paymentMethodId,status!!,lastFour!!,idOrder!!)
+
+                }else{
+                    goToPaymentsStatus(paymentMethodId,"denied","","")
+                    Toast.makeText(this@ClientOrderCheckOutActivity, "No hubo una respuesta exitosa", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                ProgressDialogFragment.hideProgressBar(this@ClientOrderCheckOutActivity)
+                Toast.makeText(this@ClientOrderCheckOutActivity, "Error ${t.message}", Toast.LENGTH_LONG)
+                    .show()
+            }
+
+        })
+
+    }
+
+    private fun goToPaymentsStatus(paymentMethodId: String, paymentStatus: String, lastFourDigits: String, id_order: String){
+        val i = Intent(this, ClientPaymentsStatusActivity::class.java)
+        i.putExtra("paymentMethodId", paymentMethodId)
+        i.putExtra("paymentStatus", paymentStatus)
+        i.putExtra("lastFourDigits", lastFourDigits)
+        i.putExtra("idOrder", id_order)
+        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(i)
     }
 }

@@ -48,7 +48,7 @@ class ClientCategoriesFragment : Fragment() {
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         recyclerViewCategories = myView?.findViewById(R.id.recyclerview_categories)
-        recyclerViewCategories?.layoutManager = LinearLayoutManager(requireContext()) //los elementos se mostraran de manera vertical
+//        recyclerViewCategories?.layoutManager = LinearLayoutManager(requireContext()) //los elementos se mostraran de manera vertical
 
         sharedPref = SharedPref(requireActivity())
 
