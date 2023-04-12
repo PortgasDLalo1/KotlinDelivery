@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.eduardo.kotlinudemydelivery.Providers.MercadoPagoProvider
+import com.eduardo.kotlinudemydelivery.Providers.OrdersProvider
 import com.eduardo.kotlinudemydelivery.Providers.PaymentsProvider
 import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.R
@@ -90,6 +91,8 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
     var firstSixDigits = ""
     var total = 0.0
     var installmentsSelected = ""
+    var idRestaurant = ""
+    var orderProvider: OrdersProvider? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityClientOrderCheckOutBinding.inflate(layoutInflater)
@@ -99,12 +102,9 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         getUserFromSession()
         sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
         paymentsProvider = PaymentsProvider(user?.sessionToken!!)
-        //
-//        getSucursales()
+        orderProvider = OrdersProvider(user?.sessionToken!!)
         binding.recyclerviewCheck.layoutManager = LinearLayoutManager(this)
         edittextCvvCheck = findViewById(R.id.edittext_cvv_check)
-//        getProductsFromSharedPref()
-//        getCardsFromSharedPref()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map_check) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
@@ -133,7 +133,14 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         validCvvInput()
         binding.cardviewInstallment.visibility = View.GONE
 
-        binding.btnPay?.setOnClickListener { createPayment() }
+        binding.btnPay?.setOnClickListener {
+            if(binding.textviewCard.text == "Efectivo"){
+                Toast.makeText(this, "EFECTIVO", Toast.LENGTH_SHORT).show()
+                createPaymentEfectivo()
+            }else{
+                createPayment() 
+            }
+        }
     }
 
     private fun goToCardList(){
@@ -219,9 +226,11 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         )
         sucursalesDistance?.add(better)
         Log.d(TAG, "sucursalesDistance: "+sucursalesDistance)
-//        getAddressFromSession()
         drawOnMap(sucursalesDistance?.get(0)?.latlng!!, sessionLocation!!)
         binding.textViewNameRestaurant.text = "31 Sushi & Bar(${sucursalesDistance?.get(0)!!.neighborhood})"
+        sucuDistance.clear()
+        idRestaurant = better.id!!
+        sucursalesDistance?.clear()
     }
 
     private fun getDistanceBetween(fromLatLng: LatLng, toLatLng: LatLng): Float{
@@ -257,40 +266,17 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         builder.include(markerAddress?.position!!)
         builder.include(markerSucursal?.position!!)
 
-        var bounds: LatLngBounds? = null
         var width = 0
         var height = 0
         var padding = 0
-        /*if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
-            bounds = builder.build()
-            width = resources.displayMetrics.widthPixels
-            height = resources.displayMetrics.heightPixels
-            padding = (width * 0.40).toInt()
-            var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
-            googleMap?.animateCamera(ca)
-        }else{
-            bounds = builder.build()
-            width = resources.displayMetrics.widthPixels
-            height = resources.displayMetrics.heightPixels
-            padding = (width * 0.40).toInt()
-            var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
-            googleMap?.animateCamera(ca)
-        }*/
 
-        bounds = builder.build()
+        val bounds = builder.build()
         width = resources.displayMetrics.widthPixels
         height = resources.displayMetrics.heightPixels
         val minMetric = min(width,height)
-        padding = minMetric.div(3)
-        var ca = CameraUpdateFactory.newLatLngBounds(bounds,width,height,padding)
+        padding = minMetric.div(10)
+        var ca = CameraUpdateFactory.newLatLngBounds(bounds,padding)
         googleMap?.animateCamera(ca)
-
-
-//        googleMap?.moveCamera(
-//            CameraUpdateFactory.newCameraPosition(
-//                CameraPosition.builder().target(sessionLocation!!).zoom(13f).build()
-//            )
-//        )
         easyDrawRoute()
     }
 
@@ -421,6 +407,10 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
                 cardHolder = cardSession?.name_client!!
             }
 
+        }else{
+            binding.textviewCard.text = "Efectivo"
+            binding.imageViewIconCard.setImageResource(R.drawable.efectivo)
+            binding.cardviewCvv?.visibility = View.GONE
         }
     }
 
@@ -528,13 +518,53 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         })
     }
 
+    private fun createPaymentEfectivo(){
+        val order = Order(
+            products = selectedProducts,
+            id_client = user?.id!!,
+            id_address = address?.id!!,
+            id_restaurant =  idRestaurant,
+            installments_type = "Efectivo"
+        )
+
+        paymentMethodId = "Efectivo"
+        ProgressDialogFragment.showProgressBar(this)
+
+        orderProvider?.create(order)?.enqueue(object : Callback<ResponseHttp>{
+            override fun onResponse(call: Call<ResponseHttp>, response: Response<ResponseHttp>) {
+                ProgressDialogFragment.hideProgressBar(this@ClientOrderCheckOutActivity)
+                if (response.body()!=null){
+                    if (response.body()?.isSuccess == true){
+                        if (response.body()?.isSuccess== true){
+                            sharedPref?.remove("order")
+                        }
+                        Toast.makeText(this@ClientOrderCheckOutActivity, response.body()?.message, Toast.LENGTH_LONG)
+                            .show()
+                        goToPaymentsStatus(paymentMethodId,"approved","","")
+                    }
+                }else{
+                    goToPaymentsStatus(paymentMethodId,"denied","","")
+                    Toast.makeText(this@ClientOrderCheckOutActivity, "No hubo una respuesta exitosa", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                ProgressDialogFragment.hideProgressBar(this@ClientOrderCheckOutActivity)
+                Toast.makeText(this@ClientOrderCheckOutActivity, "Error ${t.message}", Toast.LENGTH_LONG)
+                    .show()
+            }
+
+        })
+    }
+
     private fun createPayment(){
         Log.d(TAG,"Create $paymentTypeId")
         val order = Order(
             products = selectedProducts,
             id_client = user?.id!!,
             id_address = address?.id!!,
-            id_restaurant =  sucursalesDistance?.get(0)?.id,
+            id_restaurant =  idRestaurant,
             installments_type = paymentTypeId.toString()!!
         )
 

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.adapters.ShoppingBagAdapter
@@ -76,8 +77,9 @@ class ClientHomeActivity : AppCompatActivity() {
     private fun openFragment(fragment: Fragment){
 
         val transaction = supportFragmentManager.beginTransaction()
+//        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
         transaction.replace(R.id.container, fragment)
-        transaction.addToBackStack(null)
+//        transaction.addToBackStack(null)
         transaction.commit()
 
     }

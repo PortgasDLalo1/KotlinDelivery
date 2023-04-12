@@ -31,7 +31,7 @@ class ProductsProvider(val token: String) {
 
         for (i in 0 until files.size){
             val reqFile = RequestBody.create(MediaType.parse("image/*"), files[i])
-            images[i] = MultipartBody.Part.createFormData("image",files[i].name, reqFile)
+            images[i] = MultipartBody.Part.createFormData("images",files[i].name, reqFile)
         }
 
 
