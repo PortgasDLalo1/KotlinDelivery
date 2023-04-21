@@ -79,7 +79,7 @@ class ClientHomeActivity : AppCompatActivity() {
         val transaction = supportFragmentManager.beginTransaction()
 //        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
         transaction.replace(R.id.container, fragment)
-//        transaction.addToBackStack(null)
+        transaction.addToBackStack(null)
         transaction.commit()
 
     }

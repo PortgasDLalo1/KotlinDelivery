@@ -22,6 +22,7 @@ import com.eduardo.kotlinudemydelivery.fragments.client.ClientCategoriesFragment
 import com.eduardo.kotlinudemydelivery.fragments.client.ClientOrdersFragment
 import com.eduardo.kotlinudemydelivery.fragments.client.ClientProfileFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.*
+import com.eduardo.kotlinudemydelivery.fragments.restaurant.categories.RestaurantCategoryListFragment
 import com.eduardo.kotlinudemydelivery.models.*
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.eduardo.kotlinudemydelivery.utils.SocketPaymentHandler
@@ -53,6 +54,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     var sucursalesProvider: SucursalesProvider? = null
     var ordersProvider: OrdersProvider? = null
     var user: User? = null
+    var sucursal: Sucursales? = null
     var sucursales: Sucursales? = null
     var mSocket: Socket? = null
     var gson = Gson()
@@ -78,7 +80,8 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                 }
 
                 R.id.item_category -> {
-                    openFragment(RestaurantCategoryFragment())
+//                    openFragment(RestaurantCategoryFragment())
+                    openFragment(RestaurantCategoryListFragment())
                     true
                 }
 
@@ -216,8 +219,8 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     }
 
     private fun saveSucursalSession(data: String){
-        val sucursal = gson.fromJson(data,Sucursales::class.java)
-        sharedPref?.save("sucursal",sucursal)
+        sucursal = gson.fromJson(data,Sucursales::class.java)
+        sharedPref?.save("sucursal",sucursal!!)
         Log.d(TAG,sucursal.toString())
     }
 

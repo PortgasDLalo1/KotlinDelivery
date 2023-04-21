@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    android:layout_margin="10dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageview_category_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/hamburguesas"
+            android:scaleType="centerCrop"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:alpha="0.5"/>
+
+        <TextView
+            android:id="@+id/textview_category_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Nombre de la categoria"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:fontFamily="@font/roboto_regular"/>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>

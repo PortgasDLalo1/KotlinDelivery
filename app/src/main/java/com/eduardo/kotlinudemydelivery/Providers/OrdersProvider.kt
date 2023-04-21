@@ -23,8 +23,8 @@ class OrdersProvider(val token: String) {
         ordersRoutes = api.getOrdersRoutes(token)
     }
 
-    fun getOrdersByStatus(status: String): Call<ArrayList<Order>>?{
-        return ordersRoutes?.getOrdersByStatus(status,token)
+    fun getOrdersByStatus(status: String, id_restaurant: String): Call<ArrayList<Order>>?{
+        return ordersRoutes?.getOrdersByStatus(status,id_restaurant,token)
     }
 
     fun getOrdersByClientAndStatus(idClient: String,status: String): Call<ArrayList<Order>>?{

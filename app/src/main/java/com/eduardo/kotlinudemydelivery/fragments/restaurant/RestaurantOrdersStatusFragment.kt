@@ -19,6 +19,7 @@ import com.eduardo.kotlinudemydelivery.adapters.OrdersRestaurantAdapter
 import com.eduardo.kotlinudemydelivery.models.Order
 import com.eduardo.kotlinudemydelivery.models.SocketEmit
 import com.eduardo.kotlinudemydelivery.models.SocketEmitPagado
+import com.eduardo.kotlinudemydelivery.models.Sucursales
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.eduardo.kotlinudemydelivery.utils.SocketPaymentHandler
@@ -38,6 +39,7 @@ class RestaurantOrdersStatusFragment : Fragment() {
     var myView: View? = null
     var ordersProvider: OrdersProvider? = null
     var user: User? = null
+    var sucursal: Sucursales? = null
     var sharedPref: SharedPref? = null
     var recyclerViewOrders: RecyclerView? = null
     var adapter: OrdersRestaurantAdapter? = null
@@ -60,6 +62,7 @@ class RestaurantOrdersStatusFragment : Fragment() {
         status = arguments?.getString("status")!!
 
         getUserFromSession()
+        getSucursalFromSession()
         ordersProvider = OrdersProvider(user?.sessionToken!!)
         recyclerViewOrders = myView?.findViewById(R.id.recyclerview_orders)
         fabReaload = myView?.findViewById(R.id.fab_reload)
@@ -82,7 +85,7 @@ class RestaurantOrdersStatusFragment : Fragment() {
     }
 
     fun getOrders(){
-        ordersProvider?.getOrdersByStatus(status)?.enqueue(object :
+        ordersProvider?.getOrdersByStatus(status,sucursal?.id!!)?.enqueue(object :
             Callback<ArrayList<Order>> {
             override fun onResponse(
                 call: Call<ArrayList<Order>>,
@@ -152,6 +155,13 @@ class RestaurantOrdersStatusFragment : Fragment() {
         if (!sharedPref?.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+        }
+    }
+
+    private fun getSucursalFromSession(){
+        val gson = Gson()
+        if (!sharedPref?.getData("sucursal").isNullOrBlank()){
+            sucursal = gson.fromJson(sharedPref?.getData("sucursal"),Sucursales::class.java)
         }
     }
 

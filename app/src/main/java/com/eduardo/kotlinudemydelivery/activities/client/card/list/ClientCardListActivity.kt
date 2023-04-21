@@ -59,12 +59,13 @@ class ClientCardListActivity : AppCompatActivity() {
         binding.recyclerviewCard.layoutManager = LinearLayoutManager(this)
         edittextNumberCard = findViewById(R.id.edittext_number_card)
         edittextExpiration = findViewById(R.id.edittext_expiration)
+
         val metrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(metrics)
         val width = metrics. widthPixels// ancho absoluto en pixels
         height = metrics.heightPixels // alto absoluto en pixels
         trescuartos = (height/10)
-        dpheight = 370 * getResources().getDisplayMetrics().density; // convertir pixeles a dp
+        dpheight = 370 * resources.displayMetrics.density; // convertir pixeles a dp
 
         toolbar = findViewById(R.id.toolbar)
         toolbar?.setTitleTextColor(ContextCompat.getColor(this,R.color.black))
