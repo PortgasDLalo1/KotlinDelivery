@@ -44,7 +44,7 @@ class ClientProductsListActivity : AppCompatActivity() {
         toolbar?.title = "Productos"
         toolbar?.setTitleTextColor(ContextCompat.getColor(this,R.color.black))
         setSupportActionBar(toolbar)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         sharedPref = SharedPref(this)
         idCategory = intent.getStringExtra("idCategory")
         getUserFromSession()

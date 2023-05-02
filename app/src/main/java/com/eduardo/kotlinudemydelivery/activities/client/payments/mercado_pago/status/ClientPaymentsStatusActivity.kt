@@ -21,6 +21,7 @@ class ClientPaymentsStatusActivity : AppCompatActivity() {
     var paymentStatus = ""
     var lastFourDigits = ""
     var idOrder = ""
+    var idRestaurant =""
     var mSocket: Socket? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +32,7 @@ class ClientPaymentsStatusActivity : AppCompatActivity() {
         paymentStatus = intent.getStringExtra("paymentStatus").toString()
         lastFourDigits = intent.getStringExtra("lastFourDigits").toString()
         idOrder = intent.getStringExtra("idOrder").toString()
+        idRestaurant=intent.getStringExtra("idRestaurant").toString()
         connectSocket()
 
         if (paymentStatus == "approved"){
@@ -61,7 +63,8 @@ class ClientPaymentsStatusActivity : AppCompatActivity() {
     private fun emitPago(){
         mSocket = SocketPaymentHandler.getSocket()
         val data = SocketEmitPagado(
-            id_order = idOrder
+            id_order = idOrder,
+            id_restaurant = idRestaurant
         )
 
         mSocket!!.emit("pagado",data.toJson())

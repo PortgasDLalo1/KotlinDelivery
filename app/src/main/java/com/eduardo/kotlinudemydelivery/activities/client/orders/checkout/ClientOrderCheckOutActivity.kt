@@ -227,6 +227,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         sucursalesDistance?.add(better)
         Log.d(TAG, "sucursalesDistance: "+sucursalesDistance)
         drawOnMap(sucursalesDistance?.get(0)?.latlng!!, sessionLocation!!)
+
         binding.textViewNameRestaurant.text = "31 Sushi & Bar(${sucursalesDistance?.get(0)!!.neighborhood})"
         sucuDistance.clear()
         idRestaurant = better.id!!
@@ -540,7 +541,8 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
                         }
                         Toast.makeText(this@ClientOrderCheckOutActivity, response.body()?.message, Toast.LENGTH_LONG)
                             .show()
-                        goToPaymentsStatus(paymentMethodId,"approved","","")
+                        val idOrder = response.body()?.data?.get("id")?.asString
+                        goToPaymentsStatus(paymentMethodId,"approved","",idOrder!!)
                     }
                 }else{
                     goToPaymentsStatus(paymentMethodId,"denied","","")
@@ -627,6 +629,7 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
         i.putExtra("paymentStatus", paymentStatus)
         i.putExtra("lastFourDigits", lastFourDigits)
         i.putExtra("idOrder", id_order)
+        i.putExtra("idRestaurant", idRestaurant )
         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(i)
     }

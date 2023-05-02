@@ -6,49 +6,102 @@
     android:layout_height="match_parent"
     tools:context=".activities.client.products.detail.ClientProductsDetailActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:fitsSystemWindows="true"
+        android:background="@color/white">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Collapsed"
+            app:contentScrim="@color/white"
+            app:expandedTitleMarginBottom="28dp"
+            app:expandedTitleMarginStart="72dp"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:statusBarScrim="@color/black"
+            app:collapsedTitleTextColor="@color/black">
+
+            <com.denzcoskun.imageslider.ImageSlider
+                android:id="@+id/imagesalider"
+                android:layout_width="wrap_content"
+                android:layout_height="300dp"
+                app:iss_auto_cycle="true"
+                app:iss_period="5000"
+                app:iss_delay="0"/>
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_products"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                android:theme="@style/AppTheme"
+                app:layout_collapseMode="pin"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
+                app:titleTextColor="@color/black"
+                app:navigationIcon="@drawable/arrow_back"/>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/white"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.denzcoskun.imageslider.ImageSlider
-            android:id="@+id/imagesalider"
-            android:layout_width="wrap_content"
-            android:layout_height="300dp"
-            app:iss_auto_cycle="true"
-            app:iss_period="5000"
-            app:iss_delay="0"/>
-
-        <TextView
-            android:id="@+id/textview_productlistname"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nombre del producto"
-            android:textSize="20sp"
-            android:textColor="@color/black"
-            android:layout_marginHorizontal="25dp"
-            android:layout_marginTop="15dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Descripcion"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginHorizontal="25dp"
-            android:layout_marginTop="35dp"/>
+            <!--        <com.denzcoskun.imageslider.ImageSlider-->
+            <!--            android:id="@+id/imagesalider"-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="300dp"-->
+            <!--            app:iss_auto_cycle="true"-->
+            <!--            app:iss_period="5000"-->
+            <!--            app:iss_delay="0"/>-->
 
-        <TextView
-            android:id="@+id/textview_productlistdescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Descripcion asdasdasdasda fsdf sf wer sfergferg wfwefwe erfergerge eaewe wefwef"
-            android:textSize="16sp"
-            android:layout_marginHorizontal="25dp"
-            android:maxLength="255"
-            android:layout_marginTop="15dp"/>
+<!--            <TextView-->
+<!--                android:id="@+id/textview_productlistname"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Nombre del producto"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_marginHorizontal="25dp"-->
+<!--                android:layout_marginTop="15dp"/>-->
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripcion"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="35dp"/>
+
+            <TextView
+                android:id="@+id/textview_productlistdescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripcion asdasdasdasda fsdf sf wer sfergferg wfwefwe erfergerge eaewe wefwef"
+                android:textSize="16sp"
+                android:layout_marginHorizontal="25dp"
+                android:maxLength="255"
+                android:layout_marginTop="15dp"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 
     <LinearLayout
         android:layout_width="match_parent"
