@@ -1,5 +1,6 @@
 package com.eduardo.kotlinudemydelivery.fragments.client
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -15,16 +16,22 @@ import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.shopping_bag.ClientShoppingBagActivity
 import com.eduardo.kotlinudemydelivery.adapters.CategoriesAdapter
+import com.eduardo.kotlinudemydelivery.adapters.ShoppingBagAdapter
+import com.eduardo.kotlinudemydelivery.databinding.FragmentClientCategoriesBinding
 import com.eduardo.kotlinudemydelivery.models.Category
+import com.eduardo.kotlinudemydelivery.models.Product
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class ClientCategoriesFragment : Fragment() {
-
+    private lateinit var binding: FragmentClientCategoriesBinding
     var myView: View? = null
     var recyclerViewCategories: RecyclerView? = null
     var categoriesProvider: CategoriesProvider? = null
@@ -34,20 +41,27 @@ class ClientCategoriesFragment : Fragment() {
     var categories = ArrayList<Category>()
     val TAG = "CategoriesFragment"
     var toolbar: Toolbar? = null
-
+    private lateinit var badge: BadgeDrawable
+    private var contador = 0
+    var selectedProducts = ArrayList<Product>()
+    var gson = Gson()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        myView = inflater.inflate(R.layout.fragment_client_categories, container, false)
-        setHasOptionsMenu(true)
-        toolbar = myView?.findViewById(R.id.toolbar)
-        toolbar?.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        toolbar?.title = "Categorias"
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        binding = FragmentClientCategoriesBinding.inflate(inflater,container,false)
+//        myView = inflater.inflate(R.layout.fragment_client_categories, container, false)
+        val view = binding.root
+        badge = BadgeDrawable.create(requireContext())
 
-        recyclerViewCategories = myView?.findViewById(R.id.recyclerview_categories)
+        setHasOptionsMenu(true)
+//        toolbar = myView?.findViewById(R.id.toolbar)
+        binding.toolbar?.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding. toolbar?.title = "Categorias"
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+
+//        recyclerViewCategories = myView?.findViewById(R.id.recyclerview_categories)
 //        recyclerViewCategories?.layoutManager = LinearLayoutManager(requireContext()) //los elementos se mostraran de manera vertical
 
         sharedPref = SharedPref(requireActivity())
@@ -57,16 +71,19 @@ class ClientCategoriesFragment : Fragment() {
         categoriesProvider = CategoriesProvider(user?.sessionToken!!)
 
         getCategories()
-        return myView
+        return view
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_shopping_bag, menu)
+        inflater.inflate(R.menu.menu_badge_toolbar, menu)
+        BadgeUtils.attachBadgeDrawable(badge,binding.toolbar!!, R.id.menu_badge)
+        //badge.number = contador
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.item_shopping_bag){
+        if(item.itemId == R.id.menu_badge){
             goToShoppingBag()
         }
         return super.onOptionsItemSelected(item)
@@ -86,7 +103,7 @@ class ClientCategoriesFragment : Fragment() {
                 if (response.body() != null){
                     categories = response.body()!!
                     adapter = CategoriesAdapter(requireActivity(),categories)
-                    recyclerViewCategories?.adapter = adapter
+                    binding.recyclerviewCategories?.adapter = adapter
                 }
             }
 
@@ -99,10 +116,26 @@ class ClientCategoriesFragment : Fragment() {
     }
 
     private fun getUserFromSession(){
-        val gson = Gson()
+//        val gson = Gson()
         if (!sharedPref?.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+        }
+    }
+
+    override fun onResume() {
+        getProductsFromSharedPref()
+        super.onResume()
+    }
+
+    private fun getProductsFromSharedPref(){
+        if (!sharedPref?.getData("order").isNullOrBlank()){ // si existe una orden en sharedpref
+            val type = object: TypeToken<ArrayList<Product>>() {}.type
+            selectedProducts = gson.fromJson(sharedPref?.getData("order"), type)
+            contador = selectedProducts.size
+            badge.number = contador
+        }else{
+            badge.number = 0
         }
     }
 }

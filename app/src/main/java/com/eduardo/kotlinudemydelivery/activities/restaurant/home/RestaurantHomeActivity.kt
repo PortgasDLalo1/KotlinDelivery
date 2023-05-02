@@ -45,7 +45,7 @@ import retrofit2.Response
 class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
 
     private lateinit var binding: ActivityRestaurantHomeBinding
-    private val TAG = "RestaurantHome"
+    private val TAG = "RestaurantH"
     var sharedPref: SharedPref? = null
 
     var bottomNavigation: BottomNavigationView? = null
@@ -115,7 +115,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
         Printooth.init(this)
         checarPrint()
 //        getOneOrder("29")
-        connectSocket()
+//        connectSocket()
     }
 
     private fun connectSocket(){
@@ -124,12 +124,12 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
 //        socket?.connect()
         SocketPaymentHandler.establishConnection()
         mSocket = SocketPaymentHandler.getSocket()
-
-        mSocket?.on("pagado/1"){args ->
+        Log.d(TAG,"chee   ${sucursal?.id}")
+        mSocket?.on("pagado/${sucursal?.id.toString()}"){args ->
             if (args[0] != null){
                 runOnUiThread {
                     val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
-//                    Toast.makeText(this, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
+                   Toast.makeText(this, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
                     getOneOrder(data.id_order)
                 }
             }
@@ -140,7 +140,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
         super.onDestroy()
         mSocket?.disconnect()
     }
-    private fun getOneOrder(idOrder: String){
+    fun getOneOrder(idOrder: String){
         ordersProvider?.getOrdersByIdOrder(idOrder)?.enqueue(object :
             Callback<ArrayList<Order>> {
             override fun onResponse(
@@ -208,7 +208,8 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                 response: Response<ResponseHttp>
             ) {
                 saveSucursalSession(response.body()?.data.toString())
-//                Log.d(TAG, "BODYY: ${response.body()}")
+                Log.d(TAG, "BODYY: ${response.body()}")
+//                connectSocket()
             }
 
             override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
@@ -219,9 +220,13 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     }
 
     private fun saveSucursalSession(data: String){
-        sucursal = gson.fromJson(data,Sucursales::class.java)
-        sharedPref?.save("sucursal",sucursal!!)
-        Log.d(TAG,sucursal.toString())
+        if (!sharedPref?.getData("sucursal").isNullOrBlank()){
+            sucursal  = gson.fromJson(sharedPref?.getData("sucursal"),Sucursales::class.java)
+        } else {
+            sucursal = gson.fromJson(data,Sucursales::class.java)
+            sharedPref?.save("sucursal",sucursal!!)
+            Log.d(TAG,sucursal.toString())
+        }
     }
 
     private fun checaBluetooth() {

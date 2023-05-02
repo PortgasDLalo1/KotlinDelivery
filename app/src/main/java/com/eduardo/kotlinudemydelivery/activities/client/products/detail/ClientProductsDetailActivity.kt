@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.denzcoskun.imageslider.constants.ScaleTypes
 import com.denzcoskun.imageslider.models.SlideModel
 import com.eduardo.kotlinudemydelivery.R
@@ -44,7 +45,12 @@ class ClientProductsDetailActivity : AppCompatActivity() {
 
         binding.imagesalider.setImageList(imageList)
 
-        binding.textviewProductlistname.text = product?.name
+        binding.toolbarProducts.title = "${product?.name}"
+        binding.toolbarProducts.setTitleTextColor(ContextCompat.getColor(this,R.color.black))
+        setSupportActionBar(binding.toolbarProducts)
+        binding.toolbarProducts.setNavigationOnClickListener { finish() }
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        binding.textviewProductlistname.text = product?.name
         binding.textviewProductlistdescription.text = product?.description
         binding.textviewPrice.text = "$ ${product?.price}"
 
@@ -85,6 +91,7 @@ class ClientProductsDetailActivity : AppCompatActivity() {
                 binding.textviewPrice.text = "$ ${productPrice}"
                 binding.btnAddProduct.setText("Editar Producto")
                 binding.btnAddProduct.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                counter = product?.quantity!!
             }
 
             for (p in selectedProducts){

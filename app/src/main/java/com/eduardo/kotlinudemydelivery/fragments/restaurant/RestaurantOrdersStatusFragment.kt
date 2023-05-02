@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.Providers.OrdersProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.restaurant.home.RestaurantHomeActivity
 import com.eduardo.kotlinudemydelivery.adapters.OrdersClientAdapter
 import com.eduardo.kotlinudemydelivery.adapters.OrdersRestaurantAdapter
 import com.eduardo.kotlinudemydelivery.models.Order
@@ -70,17 +71,23 @@ class RestaurantOrdersStatusFragment : Fragment() {
 
         getOrders()
 //        getOneOrder("13")
-//        connectSocket()
+        connectSocket()
+//        SocketPaymentHandler.setSocket()
         fabReaload?.setOnClickListener { getOrders() }
-        mSocket = SocketPaymentHandler.getSocket()
-        mSocket?.on("pagado/1"){args ->
-            if (args[0] != null){
-                activity?.runOnUiThread {
-                    val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
-                    getOrders()
-                }
-            }
-        }
+//        SocketPaymentHandler.setSocket()
+//        SocketPaymentHandler.establishConnection()
+//        mSocket = SocketPaymentHandler.getSocket()
+//        Log.d(TAG,"chee2   ${sucursal?.id}")
+//        mSocket?.on("pagado/${sucursal?.id.toString()}"){args ->
+//            if (args[0] != null){
+//                activity?.runOnUiThread {
+//                    val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
+//                    Log.d(TAG,"chee3   ${data}")
+//                    Toast.makeText(context, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
+//                    getOrders()
+//                }
+//            }
+//        }
         return myView
     }
 
@@ -105,23 +112,26 @@ class RestaurantOrdersStatusFragment : Fragment() {
         })
     }
 
-//    private fun connectSocket(){
-//        SocketPaymentHandler.setSocket()
-//        socket = SocketPaymentHandler.getSocket()
-//        socket?.connect()
-//
-//        socket?.on("pagado/1"){args ->
-//            if (args[0] != null){
-//                activity?.runOnUiThread {
-//                    val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
-//                    Toast.makeText(context, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
-//                    getOneOrder(data.id_order)
-//                }
-//            }
-//        }
-//    }
+    private fun connectSocket(){
+        SocketPaymentHandler.setSocket()
+        SocketPaymentHandler.establishConnection()
+        mSocket = SocketPaymentHandler.getSocket()
+//        mSocket?.connect()
 
-    private fun getOneOrder(idOrder: String){
+        mSocket?.on("pagado/${sucursal?.id.toString()}"){args ->
+            if (args[0] != null){
+                activity?.runOnUiThread {
+                    val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
+                    Toast.makeText(context, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
+//                    getOneOrder(data.id_order)
+                    (activity as RestaurantHomeActivity).getOneOrder(data.id_order)
+                    getOrders()
+                }
+            }
+        }
+    }
+
+    private fun getOneOrder1(idOrder: String){
         ordersProvider?.getOrdersByIdOrder(idOrder)?.enqueue(object :
             Callback<ArrayList<Order>>{
             override fun onResponse(
