@@ -113,7 +113,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
         getSucursal()
         checaBluetooth()
         Printooth.init(this)
-        checarPrint()
+//        checarPrint()
 //        getOneOrder("29")
 //        connectSocket()
     }
@@ -159,9 +159,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
 
                     //getOrders()
                     val order2 = order?.get(0)
-                    printText(order2!!)
-//                    val fragment = Fragment()
-//                    (fragment as RestaurantOrdersStatusFragment).getOrders()
+                    //printText(order2!!)
                 }
             }
 

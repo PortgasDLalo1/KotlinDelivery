@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -36,10 +36,14 @@
         android:theme="@style/Theme.KotlinUdemyDelivery"
         android:usesCleartextTraffic="true"
         tools:replace="android:theme"
-        tools:targetApi="31">
-        <activity android:name=".activities.client.orders.checkout.ClientOrderCheckOutActivity"
+        tools:targetApi="31" >
+        <activity
+            android:name=".activities.restaurant.category.RestaurantCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.client.orders.checkout.ClientOrderCheckOutActivity"
             android:exported="false"
-            android:parentActivityName=".activities.client.shopping_bag.ClientShoppingBagActivity"/>
+            android:parentActivityName=".activities.client.shopping_bag.ClientShoppingBagActivity" />
         <activity
             android:name=".activities.client.card.list.ClientCardListActivity"
             android:exported="false"
@@ -87,14 +91,14 @@
             android:exported="false" />
         <activity
             android:name=".activities.client.orders.map.ClientOrdersMapActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.delivery.orders.map.DeliveryOrdersMapActivity"
-            android:exported="true">
+            android:exported="true" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -102,7 +106,7 @@
         <activity
             android:name=".activities.delivery.orders.detail.DeliveryOrdersDetailActivity"
             android:exported="true"
-            android:parentActivityName=".activities.delivery.home.DeliveryHomeActivity">
+            android:parentActivityName=".activities.delivery.home.DeliveryHomeActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -110,7 +114,7 @@
         <activity
             android:name=".activities.restaurant.orders.detail.RestaurantOrdersDetailActivity"
             android:exported="true"
-            android:parentActivityName=".activities.restaurant.home.RestaurantHomeActivity">
+            android:parentActivityName=".activities.restaurant.home.RestaurantHomeActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -118,21 +122,21 @@
         <activity
             android:name=".activities.client.orders.detail.ClientOrdersDetailActivity"
             android:exported="true"
-            android:parentActivityName=".activities.client.home.ClientHomeActivity">
+            android:parentActivityName=".activities.client.home.ClientHomeActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.client.payments.mercado_pago.form.ClientPaymentFormActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.client.address.map.ClientAddressMapActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -140,7 +144,7 @@
         <activity
             android:name=".activities.client.address.create.ClientAddressCreateActivity"
             android:exported="false"
-            android:parentActivityName=".activities.client.address.list.ClientAddressListActivity">
+            android:parentActivityName=".activities.client.address.list.ClientAddressListActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -148,7 +152,7 @@
         <activity
             android:name=".activities.client.address.list.ClientAddressListActivity"
             android:exported="false"
-            android:parentActivityName=".activities.client.orders.checkout.ClientOrderCheckOutActivity">
+            android:parentActivityName=".activities.client.orders.checkout.ClientOrderCheckOutActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -156,7 +160,7 @@
         <activity
             android:name=".activities.client.shopping_bag.ClientShoppingBagActivity"
             android:exported="true"
-            android:parentActivityName=".activities.client.home.ClientHomeActivity">
+            android:parentActivityName=".activities.client.home.ClientHomeActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -164,7 +168,7 @@
         <activity
             android:name=".activities.client.products.detail.ClientProductsDetailActivity"
             android:exported="false"
-            android:parentActivityName=".activities.client.products.list.ClientProductsListActivity">
+            android:parentActivityName=".activities.client.products.list.ClientProductsListActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -172,7 +176,7 @@
         <activity
             android:name=".activities.client.products.list.ClientProductsListActivity"
             android:exported="false"
-            android:parentActivityName=".activities.client.home.ClientHomeActivity">
+            android:parentActivityName=".activities.client.home.ClientHomeActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -180,56 +184,56 @@
         <activity
             android:name=".activities.client.update.ClientUpdateActivity"
             android:exported="true"
-            android:parentActivityName=".activities.client.home.ClientHomeActivity">
+            android:parentActivityName=".activities.client.home.ClientHomeActivity" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.SaveImageActivity"
-            android:exported="true">
+            android:exported="true" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.delivery.home.DeliveryHomeActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.restaurant.home.RestaurantHomeActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.SelectRolesActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.client.home.ClientHomeActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.RegisterActivity"
-            android:exported="false">
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".activities.MainActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -250,7 +254,7 @@
 
         <service
             android:name=".services.MyFirebaseMessagingClient"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

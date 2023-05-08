@@ -1,6 +1,8 @@
 package com.eduardo.kotlinudemydelivery.fragments.restaurant.categories
 
 import android.app.Activity
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
@@ -16,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
@@ -56,7 +59,10 @@ class RestaurantCategoryListFragment : Fragment() {
     var abrirFormCategory: TextView? = null
     var btnCerrarlayout: ImageView? = null
     var imageview_category: ImageView? = null
+    var image: ImageView? = null
     var edittext_category: EditText? = null
+    var dialog: AlertDialog? = null
+    var editCategory: EditText? = null
     var btn_create_category: Button? = null
     var height = 0
     var trescuartos = 0
@@ -105,22 +111,46 @@ class RestaurantCategoryListFragment : Fragment() {
 
         linearCategory?.translationY = heightResulta
         abrirFormCategory?.setOnClickListener {
-            view_transparent?.visibility = View.VISIBLE
-            animateLayout(heightResulta, trescuartos.toFloat(), 1.0f)
+//            view_transparent?.visibility = View.VISIBLE
+//            animateLayout(heightResulta, trescuartos.toFloat(), 1.0f)
+            showDialog()
+
         }
 
-        btnCerrarlayout?.setOnClickListener {
-            view_transparent?.visibility = View.INVISIBLE
-            animateLayout(trescuartos.toFloat(), heightResulta, 0.0f)
-        }
+//        btnCerrarlayout?.setOnClickListener {
+//            view_transparent?.visibility = View.INVISIBLE
+//            animateLayout(trescuartos.toFloat(), heightResulta, 0.0f)
+//        }
 
-        imageview_category?.setOnClickListener { selectImage() }
-        btn_create_category?.setOnClickListener { createCategory() }
+//        imageview_category?.setOnClickListener { selectImage() }
+//        btn_create_category?.setOnClickListener { createCategory() }
         return myView
     }
 
-    private fun createCategory(){
-        val name = edittext_category?.text.toString()
+    private fun showDialog(){
+        val builder = AlertDialog.Builder(requireContext())
+        val view2 = layoutInflater.inflate(R.layout.dialog_category,null)
+
+        builder.setView(view2)
+        dialog = builder.create()
+        dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.setCanceledOnTouchOutside(false)
+        dialog?.show()
+
+        editCategory = view2.findViewById<EditText>(R.id.edittext_category)
+        image = view2.findViewById<ImageView>(R.id.imageview_category)
+        val titulo = view2.findViewById<TextView>(R.id.titulo_category2)
+        val cerrar = view2.findViewById<ImageView>(R.id.btnCerrarlayout)
+        val agregar = view2.findViewById<Button>(R.id.btn_create_category)
+
+        cerrar.setOnClickListener { dialog?.dismiss() }
+        image?.setOnClickListener { selectImage() }
+        agregar.setOnClickListener { createCategory(editCategory?.text.toString()) }
+    }
+
+
+    private fun createCategory(name: String){
+        val name2 = edittext_category?.text.toString()
         if (imageFile != null){
             val category = Category(name = name)
             ProgressDialogFragment.showProgressBar(requireActivity())
@@ -133,10 +163,11 @@ class RestaurantCategoryListFragment : Fragment() {
                     ProgressDialogFragment.hideProgressBar(requireActivity())
                     Toast.makeText(requireContext(), response.body()?.message, Toast.LENGTH_LONG).show()
                     if (response.body()?.isSuccess == true){
-                        animateLayout(trescuartos.toFloat(),heightResulta,0.0f)
-                        view_transparent?.visibility = View.INVISIBLE
+//                        animateLayout(trescuartos.toFloat(),heightResulta,0.0f)
+//                        view_transparent?.visibility = View.INVISIBLE
                         clearForm()
                         getCategories()
+                        dialog?.dismiss()
                     }
                 }
 
@@ -192,7 +223,8 @@ class RestaurantCategoryListFragment : Fragment() {
         if (resultCode == Activity.RESULT_OK){
             val fileUri = data?.data
             imageFile = File(fileUri?.path) // el archivo que vamos a guardar como imagen en el servidor
-            imageview_category?.setImageURI(fileUri)
+//            imageview_category?.setImageURI(fileUri)
+            image?.setImageURI(fileUri)
         }
         else if (resultCode == ImagePicker.RESULT_ERROR){
             Toast.makeText(requireContext(), ImagePicker.getError(data), Toast.LENGTH_LONG).show()
@@ -214,9 +246,11 @@ class RestaurantCategoryListFragment : Fragment() {
     }
 
     private fun clearForm(){
-        edittext_category?.setText("")
+//        edittext_category?.setText("")
+        editCategory?.setText("")
         imageFile = null
-        imageview_category?.setImageResource(R.drawable.ic_image)
+//        imageview_category?.setImageResource(R.drawable.ic_image)
+        image?.setImageResource(R.drawable.ic_image)
     }
 
     private fun getUserFromSession(){
