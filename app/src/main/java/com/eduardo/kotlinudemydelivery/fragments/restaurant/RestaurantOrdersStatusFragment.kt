@@ -63,15 +63,16 @@ class RestaurantOrdersStatusFragment : Fragment() {
         status = arguments?.getString("status")!!
 
         getUserFromSession()
-        getSucursalFromSession()
+
         ordersProvider = OrdersProvider(user?.sessionToken!!)
+        getSucursalFromSession()
         recyclerViewOrders = myView?.findViewById(R.id.recyclerview_orders)
         fabReaload = myView?.findViewById(R.id.fab_reload)
         recyclerViewOrders?.layoutManager = LinearLayoutManager(requireContext())
 
-        getOrders()
+//        getOrders()
 //        getOneOrder("13")
-        connectSocket()
+//        connectSocket()
 //        SocketPaymentHandler.setSocket()
         fabReaload?.setOnClickListener { getOrders() }
 //        SocketPaymentHandler.setSocket()
@@ -172,6 +173,10 @@ class RestaurantOrdersStatusFragment : Fragment() {
         val gson = Gson()
         if (!sharedPref?.getData("sucursal").isNullOrBlank()){
             sucursal = gson.fromJson(sharedPref?.getData("sucursal"),Sucursales::class.java)
+//            connectSocket()
+//            Log.d("FATAL",sucursal?.id!!)
+            getOrders()
+            connectSocket()
         }
     }
 

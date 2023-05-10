@@ -31,4 +31,8 @@ class CategoriesProvider(val token: String) {
         return  categoriesRoutes?.create(image,requestBody, token)
     }
 
+    fun delete(id_category: String, imageUrl: String):Call<ResponseHttp>?{
+        return categoriesRoutes?.deleteCategory(id_category,imageUrl,token!!)
+    }
+
 }

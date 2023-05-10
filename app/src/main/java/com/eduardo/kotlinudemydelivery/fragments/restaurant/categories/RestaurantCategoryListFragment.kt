@@ -193,7 +193,8 @@ class RestaurantCategoryListFragment : Fragment() {
             ?.start()
     }
 
-    private fun getCategories(){
+    fun getCategories(){
+
         categoriesProvider?.getAll()?.enqueue(object: Callback<ArrayList<Category>> {
             override fun onResponse(
                 call: Call<ArrayList<Category>>,
@@ -204,6 +205,7 @@ class RestaurantCategoryListFragment : Fragment() {
                     Log.d(TAG, "categories: $categories")
                     adapter = CategoriesListAdapter(requireActivity(),categories)
                     recyclerViewCategories?.adapter = adapter
+                    Log.d("FATAL","entro")
                 }
             }
 

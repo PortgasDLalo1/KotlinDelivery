@@ -36,4 +36,8 @@ class SharedPref(activity: Activity) {
         prefs?.edit()?.remove(key)?.apply()
     }
 
+    fun removeAll(){
+        prefs?.edit()?.clear()?.commit()
+    }
+
 }

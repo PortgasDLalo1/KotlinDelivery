@@ -38,9 +38,6 @@
         tools:replace="android:theme"
         tools:targetApi="31" >
         <activity
-            android:name=".activities.restaurant.category.RestaurantCategoryActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.client.orders.checkout.ClientOrderCheckOutActivity"
             android:exported="false"
             android:parentActivityName=".activities.client.shopping_bag.ClientShoppingBagActivity" />
@@ -248,6 +245,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDSsni9fnDj8n425Hv7FhtvfGB8oqNGhdI" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
