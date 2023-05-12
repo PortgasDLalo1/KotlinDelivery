@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.Image
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,33 +17,49 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.registerForActivityResult
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.products.list.ClientProductsListActivity
 import com.eduardo.kotlinudemydelivery.activities.client.shopping_bag.ClientShoppingBagActivity
+import com.eduardo.kotlinudemydelivery.fragments.dialog.categoryDialog
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.categories.RestaurantCategoryListFragment
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
+import com.eduardo.kotlinudemydelivery.models.Sucursales
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
+import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.gms.dynamic.SupportFragmentWrapper
 import com.google.gson.Gson
 import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import org.w3c.dom.Text
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Category>): RecyclerView.Adapter<CategoriesListAdapter.CategoriesViewHolder>() {
 
     val sharedPref = SharedPref(context)
     var user: User? = null
+    var sucursal: Sucursales? = null
     var categoryProvider: CategoriesProvider? = null
-
+    private var imageFile: File? = null
+    var image: ImageView? = null
     init {
         getUserFromSession()
+        getSucursalFromSession()
         categoryProvider = CategoriesProvider(user?.sessionToken!!)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriesViewHolder {
@@ -54,7 +71,7 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
         return categories.size
     }
 
-    override fun onBindViewHolder(holder: CategoriesViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CategoriesViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val category = categories[position] //cada categoria
 
         holder.textViewCategory.text = category.name
@@ -64,26 +81,46 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
 //           goToProducts(category)
 //           var showPopUp = PopUpCategoryFragment()
 //           showPopUp.show((context as AppCompatActivity).supportFragmentManager, "showPopUp")
-           val builder = AlertDialog.Builder(context)
-           val view2 = LayoutInflater.from(context).inflate(R.layout.dialog_category, null)
+//           val builder = AlertDialog.Builder(context)
+//           val view2 = LayoutInflater.from(context).inflate(R.layout.dialog_category, null)
+//
+//           builder.setView(view2)
+//
+//           val dialog = builder.create()
+//           dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//           dialog.setCanceledOnTouchOutside(false)
+//           dialog.show()
+//
+//           val editCategory = view2.findViewById<EditText>(R.id.edittext_category)
+//           image = view2.findViewById<ImageView>(R.id.imageview_category)
+//           val titulo = view2.findViewById<TextView>(R.id.titulo_category2)
+//           val cerrar = view2.findViewById<ImageView>(R.id.btnCerrarlayout)
+//           val Updatebtn = view2.findViewById<Button>(R.id.btn_create_category)
+//
+//            editCategory.setText("${category.name}")
+//           Glide.with(context).load(category.image).into(image!!)
+//           titulo.setText("Modificar Categoria")
+//           Updatebtn.setText("Modificar")
+//
+//           Updatebtn.setOnClickListener {
+//
+//           }
+//
+//           image?.setOnClickListener {
+////               selectImage()
+////               pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+//           }
+//
+//           cerrar.setOnClickListener { dialog.dismiss() }
+            val fm = categoryDialog()
+            val f = (context as AppCompatActivity).supportFragmentManager
+            val bundle = Bundle()
+            bundle.putString("name", category.name)
+            bundle.putString("image", category.image)
+            fm.arguments = bundle
+            fm.isCancelable = false
+            fm.show(f, "dialog")
 
-           builder.setView(view2)
-
-           val dialog = builder.create()
-           dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-           dialog.setCanceledOnTouchOutside(false)
-           dialog.show()
-
-           val editCategory = view2.findViewById<EditText>(R.id.edittext_category)
-           val image = view2.findViewById<ImageView>(R.id.imageview_category)
-           val titulo = view2.findViewById<TextView>(R.id.titulo_category2)
-           val cerrar = view2.findViewById<ImageView>(R.id.btnCerrarlayout)
-
-            editCategory.setText("${category.name}")
-           Glide.with(context).load(category.image).into(image)
-           titulo.setText("Modificar Categoria")
-
-           cerrar.setOnClickListener { dialog.dismiss() }
         }
 
         holder.imageViewDelete.setOnClickListener {
@@ -148,6 +185,16 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
         }
     }
 
+//    val pickMedia = (context as ComponentActivity).registerForActivityResult(
+//        ActivityResultContracts.PickVisualMedia()
+//    ){
+//        uri ->
+//        if (uri != null){
+//            Log.d("FATAL", uri.toString())
+//        }
+//    }
+
+
     private fun goToProducts(category: Category){
         val i = Intent(context,ClientProductsListActivity::class.java)
         i.putExtra("idCategory", category.id)
@@ -173,6 +220,13 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
         if (!sharedPref?.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+        }
+    }
+
+    private fun getSucursalFromSession(){
+        val gson = Gson()
+        if (!sharedPref?.getData("sucursal").isNullOrBlank()){
+            sucursal = gson.fromJson(sharedPref?.getData("sucursal"),Sucursales::class.java)
         }
     }
 

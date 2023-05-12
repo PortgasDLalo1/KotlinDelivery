@@ -30,6 +30,7 @@ import com.eduardo.kotlinudemydelivery.adapters.CategoriesAdapter
 import com.eduardo.kotlinudemydelivery.adapters.CategoriesListAdapter
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
+import com.eduardo.kotlinudemydelivery.models.Sucursales
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.github.dhaval2404.imagepicker.ImagePicker
@@ -49,25 +50,20 @@ class RestaurantCategoryListFragment : Fragment() {
     var floatingButton: FloatingActionButton? = null
     var toolbar: Toolbar? = null
     var user: User? = null
+    var sucursal: Sucursales? = null
     var sharedPref: SharedPref? = null
     var categories = ArrayList<Category>()
     var adapter: CategoriesListAdapter? = null
     var categoriesProvider: CategoriesProvider? = null
 
     var linearCategory: CardView? = null
-    var view_transparent: View? = null
     var abrirFormCategory: TextView? = null
     var btnCerrarlayout: ImageView? = null
-    var imageview_category: ImageView? = null
     var image: ImageView? = null
     var edittext_category: EditText? = null
     var dialog: AlertDialog? = null
     var editCategory: EditText? = null
-    var btn_create_category: Button? = null
     var height = 0
-    var trescuartos = 0
-    var dpheight = 0f
-    var heightResulta = 0f
 
     private var imageFile: File? = null
     override fun onCreateView(
@@ -79,12 +75,8 @@ class RestaurantCategoryListFragment : Fragment() {
 
         recyclerViewCategories = myView?.findViewById(R.id.recyclerview_categories_list)
         linearCategory = myView?.findViewById(R.id.linearCategory)
-        view_transparent = myView?.findViewById(R.id.view_transparent)
         abrirFormCategory = myView?.findViewById(R.id.abrirFormCategory)
         btnCerrarlayout = myView?.findViewById(R.id.btnCerrarlayout)
-        imageview_category = myView?.findViewById(R.id.imageview_category)
-        edittext_category = myView?.findViewById(R.id.edittext_category)
-        btn_create_category = myView?.findViewById(R.id.btn_create_category)
 //        floatingButton = myView?.findViewById(R.id.fab_category_create)
 
         toolbar = myView?.findViewById(R.id.toolbar)
@@ -94,36 +86,11 @@ class RestaurantCategoryListFragment : Fragment() {
         sharedPref = SharedPref(requireActivity())
 
         getUserFromSession()
-
+        getSucursalFromSession()
         categoriesProvider = CategoriesProvider(user?.sessionToken!!)
         getCategories()
 
-        val metrics = DisplayMetrics()
-        (activity as AppCompatActivity).windowManager.defaultDisplay.getMetrics(metrics)
-        val with = metrics.widthPixels
-        height = metrics.heightPixels
-        trescuartos = (height/10)
-        dpheight = 440 * resources.displayMetrics.density
-
-        view_transparent?.visibility = View.INVISIBLE
-
-        heightResulta = - dpheight
-
-        linearCategory?.translationY = heightResulta
-        abrirFormCategory?.setOnClickListener {
-//            view_transparent?.visibility = View.VISIBLE
-//            animateLayout(heightResulta, trescuartos.toFloat(), 1.0f)
-            showDialog()
-
-        }
-
-//        btnCerrarlayout?.setOnClickListener {
-//            view_transparent?.visibility = View.INVISIBLE
-//            animateLayout(trescuartos.toFloat(), heightResulta, 0.0f)
-//        }
-
-//        imageview_category?.setOnClickListener { selectImage() }
-//        btn_create_category?.setOnClickListener { createCategory() }
+        abrirFormCategory?.setOnClickListener { showDialog() }
         return myView
     }
 
@@ -150,7 +117,6 @@ class RestaurantCategoryListFragment : Fragment() {
 
 
     private fun createCategory(name: String){
-        val name2 = edittext_category?.text.toString()
         if (imageFile != null){
             val category = Category(name = name)
             ProgressDialogFragment.showProgressBar(requireActivity())
@@ -163,8 +129,6 @@ class RestaurantCategoryListFragment : Fragment() {
                     ProgressDialogFragment.hideProgressBar(requireActivity())
                     Toast.makeText(requireContext(), response.body()?.message, Toast.LENGTH_LONG).show()
                     if (response.body()?.isSuccess == true){
-//                        animateLayout(trescuartos.toFloat(),heightResulta,0.0f)
-//                        view_transparent?.visibility = View.INVISIBLE
                         clearForm()
                         getCategories()
                         dialog?.dismiss()
@@ -181,18 +145,6 @@ class RestaurantCategoryListFragment : Fragment() {
             Toast.makeText(requireContext(),"Selecciona una imagen",Toast.LENGTH_LONG).show()
         }
     }
-
-    private fun animateLayout(y: Float, destino: Float, alfa: Float) {
-        linearCategory?.translationY  =y
-        linearCategory?.animate()
-            ?.translationY(destino)
-            ?.setInterpolator(LinearInterpolator())
-            ?.setDuration(300)
-            ?.alpha(alfa)
-            ?.setStartDelay(200)
-            ?.start()
-    }
-
     fun getCategories(){
 
         categoriesProvider?.getAll()?.enqueue(object: Callback<ArrayList<Category>> {
@@ -217,7 +169,7 @@ class RestaurantCategoryListFragment : Fragment() {
         })
     }
 
-    private val startImageForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result: ActivityResult ->
+    val startImageForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result: ActivityResult ->
 
         val resultCode = result.resultCode
         val data = result.data
@@ -260,6 +212,13 @@ class RestaurantCategoryListFragment : Fragment() {
         if (!sharedPref?.getData("user").isNullOrBlank()){
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
+        }
+    }
+
+    private fun getSucursalFromSession(){
+        val gson = Gson()
+        if (!sharedPref?.getData("sucursal").isNullOrBlank()){
+            sucursal = gson.fromJson(sharedPref?.getData("sucursal"), Sucursales::class.java)
         }
     }
 
