@@ -4,8 +4,8 @@ import com.eduardo.kotlinudemydelivery.routes.*
 
 class ApiRoutes {
 
-    val API_URL = "http://10.72.6.224:3000/api/"
-//    val API_URL = "https://kotlin-delivery-udemy.onrender.com/api/"
+//    val API_URL = "http://10.72.6.224:3000/api/"
+    val API_URL = "https://kotlin-delivery-udemy.onrender.com/api/"
 //    val API_URL = "http://192.168.3.17:3000/api/"
     val retrofit = RetrofitClient()
 
