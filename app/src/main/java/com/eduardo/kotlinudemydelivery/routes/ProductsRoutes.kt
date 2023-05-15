@@ -8,6 +8,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -19,6 +20,10 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface ProductsRoutes {
+    @GET("products/getAll")
+    fun getAll(
+        @Header("Authorization") token: String
+    ):Call<ArrayList<Product>>
 
    @GET("products/findByCategory/{id_category}")
     fun findByCategory(
@@ -32,5 +37,19 @@ interface ProductsRoutes {
         @Part images: Array<MultipartBody.Part?>,
         @Part("product") product: RequestBody,
         @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
+    @Multipart
+    @POST("products/create2")
+    fun create2(
+        @Part image: MultipartBody.Part,
+        @Part("product") product: RequestBody,
+        @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
+    @DELETE("products/deleteProduct/{id_product}/{imageUrl}")
+    fun deleteProduct(
+        @Path("id_product") id_product: String,
+        @Path("imageUrl") imageUrl: String,
     ): Call<ResponseHttp>
 }

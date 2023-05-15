@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.restaurant.products.RestaurantProductListFragment">
+
+    <include layout="@layout/action_bar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="70dp"
+        android:layout_marginHorizontal="20dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_products_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="10dp"/>
+
+        <TextView
+            android:id="@+id/abrirFormProduct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Agrega un producto"
+            android:layout_marginBottom="10dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/roboto_regular"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginBottom="70dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

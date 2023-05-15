@@ -412,6 +412,12 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
             binding.textviewCard.text = "Efectivo"
             binding.imageViewIconCard.setImageResource(R.drawable.efectivo)
             binding.cardviewCvv?.visibility = View.GONE
+
+            val efectivo = Cards(
+                number_card = "Efectivo"
+            )
+
+            sharedPref?.save("card",efectivo)
         }
     }
 

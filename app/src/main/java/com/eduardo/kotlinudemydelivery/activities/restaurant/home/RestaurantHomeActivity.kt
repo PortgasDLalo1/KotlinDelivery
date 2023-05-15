@@ -23,6 +23,7 @@ import com.eduardo.kotlinudemydelivery.fragments.client.ClientOrdersFragment
 import com.eduardo.kotlinudemydelivery.fragments.client.ClientProfileFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.*
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.categories.RestaurantCategoryListFragment
+import com.eduardo.kotlinudemydelivery.fragments.restaurant.products.RestaurantProductListFragment
 import com.eduardo.kotlinudemydelivery.models.*
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
 import com.eduardo.kotlinudemydelivery.utils.SocketPaymentHandler
@@ -86,7 +87,8 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                 }
 
                 R.id.item_product -> {
-                    openFragment(RestaurantProductFragment())
+                    openFragment(RestaurantProductListFragment())
+//                    openFragment(RestaurantProductFragment())
                     true
                 }
 

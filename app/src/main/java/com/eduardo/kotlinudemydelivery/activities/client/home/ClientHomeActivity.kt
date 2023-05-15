@@ -1,5 +1,6 @@
 package com.eduardo.kotlinudemydelivery.activities.client.home
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.client.address.list.ClientAddressListActivity
 import com.eduardo.kotlinudemydelivery.adapters.ShoppingBagAdapter
 import com.eduardo.kotlinudemydelivery.databinding.ActivityClientHomeBinding
 import com.eduardo.kotlinudemydelivery.fragments.client.ClientCategoriesFragment
@@ -63,6 +65,7 @@ class ClientHomeActivity : AppCompatActivity() {
             }
         }
         getUserFromSession()
+        getAddressFromSession()
         //getProductsFromSharedPref()
         usersProvider = UsersProvider(token = user?.sessionToken!!)
         createToken()
@@ -90,6 +93,14 @@ class ClientHomeActivity : AppCompatActivity() {
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"),User::class.java)
             //Log.e(TAG, "Usuario: $user")
+        }
+    }
+
+    private fun getAddressFromSession(){
+        if(sharedPref?.getData("address").isNullOrBlank()){
+            val i = Intent(this,ClientAddressListActivity::class.java)
+            i.putExtra("bandera",1)
+            startActivity(i)
         }
     }
 

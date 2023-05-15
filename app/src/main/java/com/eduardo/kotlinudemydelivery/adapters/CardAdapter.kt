@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.client.card.list.ClientCardListActivity
@@ -40,8 +41,8 @@ class CardAdapter(val context: Activity, val cards: ArrayList<Cards>): RecyclerV
         if(!sharedPref.getData("card").isNullOrBlank()){
             val csp = gson.fromJson(sharedPref.getData("card"),Cards::class.java)
 
-            if (csp.id == card.id){
-                Log.d(TAG,"Shared "+csp.toString())
+            if (csp.number_card == card.number_card){
+                Log.d("FATAL","FATAL"+csp.toString())
                 positionCardSession = position
                 holder.imageCheck.visibility = View.VISIBLE
             }

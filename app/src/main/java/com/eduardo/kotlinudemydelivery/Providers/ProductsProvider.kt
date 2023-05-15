@@ -21,6 +21,10 @@ class ProductsProvider(val token: String) {
         productsRoutes = api.getProductsRoutes(token)
     }
 
+    fun getAll(): Call<ArrayList<Product>>?{
+        return productsRoutes?.getAll(token)
+    }
+
     fun findByCategory(idCategory: String): Call<ArrayList<Product>>?{
         return productsRoutes?.findByCategory(idCategory,token)
     }
@@ -38,6 +42,18 @@ class ProductsProvider(val token: String) {
         val requestBody = RequestBody.create(MediaType.parse("text/plain"), product.toJson())
 
         return  productsRoutes?.create(images,requestBody, token)
+    }
+
+    fun create2(file: File, product: Product): Call<ResponseHttp>?{
+        val reqFile = RequestBody.create(MediaType.parse("image/*"), file)
+        val image = MultipartBody.Part.createFormData("image",file.name, reqFile)
+        val requestBody = RequestBody.create(MediaType.parse("text/plain"), product.toJson())
+
+        return productsRoutes?.create2(image,requestBody,token)
+    }
+
+    fun delete(id_product: String, imageUrl: String): Call<ResponseHttp>?{
+        return productsRoutes?.deleteProduct(id_product,imageUrl)
     }
 
 }

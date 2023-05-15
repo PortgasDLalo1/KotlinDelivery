@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.denzcoskun.imageslider.constants.ScaleTypes
 import com.denzcoskun.imageslider.models.SlideModel
 import com.eduardo.kotlinudemydelivery.R
@@ -43,8 +44,8 @@ class ClientProductsDetailActivity : AppCompatActivity() {
         imageList.add(SlideModel(product?.image2, ScaleTypes.CENTER_CROP))
         imageList.add(SlideModel(product?.image3, ScaleTypes.CENTER_CROP))
 
-        binding.imagesalider.setImageList(imageList)
-
+//        binding.imagesalider.setImageList(imageList)
+        Glide.with(this).load(product?.image1!!).into(binding.imageProduct)
         binding.toolbarProducts.title = "${product?.name}"
         binding.toolbarProducts.setTitleTextColor(ContextCompat.getColor(this,R.color.black))
         setSupportActionBar(binding.toolbarProducts)

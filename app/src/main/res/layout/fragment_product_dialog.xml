@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.dialog.productDialog">
+
+   <androidx.cardview.widget.CardView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       app:cardElevation="10dp"
+       android:background="@color/white"
+       app:cardCornerRadius="10dp"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical">
+
+           <ImageView
+               android:id="@+id/btnCerrarlayout"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:src="@drawable/ic_close"
+               android:layout_gravity="right"
+               android:layout_marginTop="15dp"
+               android:layout_marginHorizontal="15dp"/>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:layout_margin="20dp"
+               android:gravity="center_vertical">
+
+
+               <ImageView
+                   android:id="@+id/imageview_1"
+                   android:layout_width="0dp"
+                   android:layout_height="110dp"
+                   android:layout_weight="1"
+                   android:src="@drawable/ic_image"
+                   android:background="@color/gray_light"
+                   android:layout_marginRight="10dp"/>
+
+               <LinearLayout
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="2"
+                   android:orientation="vertical">
+
+                   <EditText
+                       android:id="@+id/edittext_name"
+                       android:layout_width="match_parent"
+                       android:layout_height="50dp"
+                       android:hint="Nombre del producto"
+                       android:background="@drawable/edittext_custom"
+                       android:padding="15dp"
+                       android:inputType="text"/>
+
+                   <EditText
+                       android:id="@+id/edittext_price"
+                       android:layout_width="match_parent"
+                       android:layout_height="50dp"
+                       android:hint="Precio del producto"
+                       android:background="@drawable/edittext_custom"
+                       android:layout_marginTop="10dp"
+                       android:padding="15dp"
+                       android:inputType="numberDecimal"/>
+
+               </LinearLayout>
+
+           </LinearLayout>
+
+           <EditText
+               android:id="@+id/edittext_description"
+               android:layout_width="match_parent"
+               android:layout_height="50dp"
+               android:hint="Descripción del producto"
+               android:background="@drawable/edittext_custom"
+               android:layout_marginLeft="20dp"
+               android:layout_marginRight="20dp"
+               android:padding="15dp"
+               android:inputType="textMultiLine"
+               android:scrollbars="vertical"
+               android:lines="8"
+               android:minLines="6"
+               android:maxLines="10"
+               android:scrollHorizontally="false"/>
+
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:layout_margin="20dp">
+
+               <Spinner
+                   android:id="@+id/spinner_categories"
+                   android:layout_width="0dp"
+                   android:layout_weight="1"
+                   android:layout_height="match_parent"
+                   android:layout_marginRight="10dp"/>
+
+               <Button
+                   android:id="@+id/btn_create_product"
+                   android:layout_width="0dp"
+                   android:layout_weight="1"
+                   android:layout_height="wrap_content"
+                   android:text="Crear Producto"
+                   android:background="@drawable/rounded_button"/>
+
+           </LinearLayout>
+
+
+       </LinearLayout>
+
+
+
+
+   </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

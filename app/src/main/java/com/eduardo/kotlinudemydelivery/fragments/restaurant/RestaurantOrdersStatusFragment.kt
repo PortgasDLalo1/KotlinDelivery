@@ -93,6 +93,7 @@ class RestaurantOrdersStatusFragment : Fragment() {
     }
 
     fun getOrders(){
+        Log.d("FATAL","$status ${sucursal?.id}")
         ordersProvider?.getOrdersByStatus(status,sucursal?.id!!)?.enqueue(object :
             Callback<ArrayList<Order>> {
             override fun onResponse(

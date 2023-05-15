@@ -78,40 +78,7 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
         Glide.with(context).load(category.image).into(holder.imageViewCategory)
 
        holder.itemView.setOnClickListener {
-//           goToProducts(category)
-//           var showPopUp = PopUpCategoryFragment()
-//           showPopUp.show((context as AppCompatActivity).supportFragmentManager, "showPopUp")
-//           val builder = AlertDialog.Builder(context)
-//           val view2 = LayoutInflater.from(context).inflate(R.layout.dialog_category, null)
-//
-//           builder.setView(view2)
-//
-//           val dialog = builder.create()
-//           dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//           dialog.setCanceledOnTouchOutside(false)
-//           dialog.show()
-//
-//           val editCategory = view2.findViewById<EditText>(R.id.edittext_category)
-//           image = view2.findViewById<ImageView>(R.id.imageview_category)
-//           val titulo = view2.findViewById<TextView>(R.id.titulo_category2)
-//           val cerrar = view2.findViewById<ImageView>(R.id.btnCerrarlayout)
-//           val Updatebtn = view2.findViewById<Button>(R.id.btn_create_category)
-//
-//            editCategory.setText("${category.name}")
-//           Glide.with(context).load(category.image).into(image!!)
-//           titulo.setText("Modificar Categoria")
-//           Updatebtn.setText("Modificar")
-//
-//           Updatebtn.setOnClickListener {
-//
-//           }
-//
-//           image?.setOnClickListener {
-////               selectImage()
-////               pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-//           }
-//
-//           cerrar.setOnClickListener { dialog.dismiss() }
+
             val fm = categoryDialog()
             val f = (context as AppCompatActivity).supportFragmentManager
             val bundle = Bundle()
@@ -185,21 +152,7 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
         }
     }
 
-//    val pickMedia = (context as ComponentActivity).registerForActivityResult(
-//        ActivityResultContracts.PickVisualMedia()
-//    ){
-//        uri ->
-//        if (uri != null){
-//            Log.d("FATAL", uri.toString())
-//        }
-//    }
 
-
-    private fun goToProducts(category: Category){
-        val i = Intent(context,ClientProductsListActivity::class.java)
-        i.putExtra("idCategory", category.id)
-        context.startActivity(i)
-    }
 
     class CategoriesViewHolder(view: View): RecyclerView.ViewHolder(view){
 

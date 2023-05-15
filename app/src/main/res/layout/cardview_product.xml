@@ -48,4 +48,17 @@
 
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/btn_delete_product"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_delete"
+        android:scaleType="centerCrop"
+        android:layout_gravity="top|right"
+        android:layout_margin="10dp"
+        android:padding="2dp"
+        android:background="@drawable/border_radius_view"
+        android:elevation="5dp"
+        android:visibility="gone"/>
+
 </androidx.cardview.widget.CardView>
