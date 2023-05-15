@@ -46,6 +46,8 @@ class categoryDialog: DialogFragment() {
         image?.setOnClickListener { selectImage() }
 
         btnCerrar?.setOnClickListener { dismiss() }
+
+        dialog?.window?.setBackgroundDrawableResource(R.drawable.card_radius2)
         return view
     }
 

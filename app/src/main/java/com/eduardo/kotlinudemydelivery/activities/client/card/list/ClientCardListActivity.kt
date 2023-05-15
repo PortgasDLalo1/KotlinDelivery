@@ -104,7 +104,7 @@ class ClientCardListActivity : AppCompatActivity() {
             finish()
             //createOrder(a.id!!)
         }else{
-            Toast.makeText(this, "Selecciona una direccion para continuar", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Selecciona un metodo de pago para continuar", Toast.LENGTH_LONG).show()
         }
     }
     private fun animateLayout(y: Float, destino: Float, alfa: Float) {
