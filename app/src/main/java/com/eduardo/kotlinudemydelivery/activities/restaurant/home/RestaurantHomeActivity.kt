@@ -63,42 +63,56 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     private var printing: Printing? = null;
     var printables = ArrayList<Printable>()
     var orders1 : Order?= null
+    private lateinit var myFragment: RestaurantOrdersStatusFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRestaurantHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         sharedPref = SharedPref(this)
 
-        openFragment(RestaurantOrdersFragment())
+        getUserFromSession()
+        createToken()
+        usersProvider = UsersProvider(user?.sessionToken!!)
+        ordersProvider = OrdersProvider(user?.sessionToken!!)
+        sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
+        //binding.btnLogout.setOnClickListener { logout() }
+        getSucursal()
 
+        openFragment(RestaurantOrdersFragment())
+        myFragment = RestaurantOrdersStatusFragment()
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener {
             when(it.itemId){
 
                 R.id.item_home -> {
-                    openFragment(RestaurantOrdersFragment())
+                    loadFragment(RestaurantOrdersFragment())
+//                    openFragment(RestaurantOrdersFragment())
                     true
                 }
 
                 R.id.item_category -> {
 //                    openFragment(RestaurantCategoryFragment())
-                    openFragment(RestaurantCategoryListFragment())
+//                    openFragment(RestaurantCategoryListFragment())
+                    loadFragment(RestaurantCategoryListFragment())
                     true
                 }
 
                 R.id.item_product -> {
-                    openFragment(RestaurantProductListFragment())
+                    loadFragment(RestaurantProductListFragment())
+//                    openFragment(RestaurantProductListFragment())
 //                    openFragment(RestaurantProductFragment())
                     true
                 }
 
                 R.id.item_profile -> {
-                    openFragment(ClientProfileFragment())
+                    loadFragment(ClientProfileFragment())
+//                    openFragment(ClientProfileFragment())
                     true
                 }
 
                 R.id.item_build -> {
-                    openFragment(RestaurantConfigFragment())
+                    loadFragment(RestaurantConfigFragment())
+//                    openFragment(RestaurantConfigFragment())
                     true
                 }
 
@@ -106,18 +120,26 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
 
             }
         }
-        getUserFromSession()
-        createToken()
-        usersProvider = UsersProvider(token = user?.sessionToken!!)
-        ordersProvider = OrdersProvider(user?.sessionToken!!)
-        sucursalesProvider = SucursalesProvider(user?.sessionToken!!)
-        //binding.btnLogout.setOnClickListener { logout() }
-        getSucursal()
+
         checaBluetooth()
         Printooth.init(this)
 //        checarPrint()
 //        getOneOrder("29")
 //        connectSocket()
+
+    }
+
+    private fun loadFragment(newFragment: Fragment){
+        if (myFragment != null){
+            val current: Fragment? = supportFragmentManager.findFragmentById(R.id.container)
+            if (current == null){
+                openFragment(newFragment)
+            }else if (!current.javaClass.name.equals(newFragment.javaClass.name)){
+                openFragment(newFragment)
+            }else{
+//                Toast.makeText(this, "${newFragment.javaClass.name}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun connectSocket(){
@@ -133,6 +155,8 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                     val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
                    Toast.makeText(this, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
                     getOneOrder(data.id_order)
+                    myFragment = RestaurantOrdersStatusFragment()
+                    myFragment.getOrders()
                 }
             }
         }
@@ -159,7 +183,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                     Log.d(TAG, "address: ${order?.get(0)?.address?.address} Colonia: ${order?.get(0)?.address?.neighborhood}")
                     Toast.makeText(this@RestaurantHomeActivity, "Response: $order", Toast.LENGTH_LONG).show()*/
 
-                    //getOrders()
+//                    getOrders()
                     val order2 = order?.get(0)
                     //printText(order2!!)
                 }
@@ -174,6 +198,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     }
 
 
+
     private fun createToken(){
         usersProvider?.createToken(user!!, this)
     }
@@ -181,11 +206,12 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     private fun openFragment(fragment: Fragment){
 
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.container, fragment)
-        transaction.addToBackStack(null)
+        transaction.replace(R.id.container, fragment, fragment.javaClass.name)
+        transaction.addToBackStack("F_MAIN")
         transaction.commit()
 
     }
+
 
     private fun logout(){
         sharedPref?.remove("user")
@@ -208,8 +234,8 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                 response: Response<ResponseHttp>
             ) {
                 saveSucursalSession(response.body()?.data.toString())
-                Log.d(TAG, "BODYY: ${response.body()}")
-//                connectSocket()
+                //Log.d("FATAL", "BODYY: ${response.body()}")
+                connectSocket()
             }
 
             override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
@@ -222,10 +248,11 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     private fun saveSucursalSession(data: String){
         if (!sharedPref?.getData("sucursal").isNullOrBlank()){
             sucursal  = gson.fromJson(sharedPref?.getData("sucursal"),Sucursales::class.java)
+            Log.d("FATAL","home: ${sharedPref?.getData("sucursal")}")
         } else {
             sucursal = gson.fromJson(data,Sucursales::class.java)
             sharedPref?.save("sucursal",sucursal!!)
-            Log.d(TAG,sucursal.toString())
+            Log.d("FATAL","home: ${sharedPref?.getData("sucursal")}")
         }
     }
 

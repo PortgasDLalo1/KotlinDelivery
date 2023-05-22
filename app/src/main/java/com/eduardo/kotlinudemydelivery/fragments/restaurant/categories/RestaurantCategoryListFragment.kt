@@ -23,11 +23,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.adapters.CategoriesAdapter
 import com.eduardo.kotlinudemydelivery.adapters.CategoriesListAdapter
+import com.eduardo.kotlinudemydelivery.databinding.FragmentRestaurantCategoryListBinding
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.Sucursales
@@ -44,11 +46,10 @@ import java.io.File
 
 class RestaurantCategoryListFragment : Fragment() {
 
-    var myView: View? = null
+//    var myView: View? = null
     val TAG = "CatListFragment"
-    var recyclerViewCategories: RecyclerView? = null
+//    var recyclerViewCategories: RecyclerView? = null
     var floatingButton: FloatingActionButton? = null
-    var toolbar: Toolbar? = null
     var user: User? = null
     var sucursal: Sucursales? = null
     var sharedPref: SharedPref? = null
@@ -57,7 +58,7 @@ class RestaurantCategoryListFragment : Fragment() {
     var categoriesProvider: CategoriesProvider? = null
 
     var linearCategory: CardView? = null
-    var abrirFormCategory: TextView? = null
+//    var abrirFormCategory: TextView? = null
     var btnCerrarlayout: ImageView? = null
     var image: ImageView? = null
     var edittext_category: EditText? = null
@@ -66,23 +67,23 @@ class RestaurantCategoryListFragment : Fragment() {
     var height = 0
 
     private var imageFile: File? = null
+
+    private  var _binding: FragmentRestaurantCategoryListBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        myView = inflater.inflate(R.layout.fragment_restaurant_category_list, container, false)
+        _binding = FragmentRestaurantCategoryListBinding.inflate(inflater,container,false)
+//        myView = inflater.inflate(R.layout.fragment_restaurant_category_list, container, false)
 
-        recyclerViewCategories = myView?.findViewById(R.id.recyclerview_categories_list)
-        linearCategory = myView?.findViewById(R.id.linearCategory)
-        abrirFormCategory = myView?.findViewById(R.id.abrirFormCategory)
-        btnCerrarlayout = myView?.findViewById(R.id.btnCerrarlayout)
+//        recyclerViewCategories = myView?.findViewById(R.id.recyclerview_categories_list)
+//
+//        linearCategory = myView?.findViewById(R.id.linearCategory)
+//        abrirFormCategory = myView?.findViewById(R.id.abrirFormCategory)
+//        btnCerrarlayout = myView?.findViewById(R.id.btnCerrarlayout)
 //        floatingButton = myView?.findViewById(R.id.fab_category_create)
-
-        toolbar = myView?.findViewById(R.id.toolbar)
-        toolbar?.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        toolbar?.title = "Categorias"
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
         sharedPref = SharedPref(requireActivity())
 
         getUserFromSession()
@@ -90,8 +91,13 @@ class RestaurantCategoryListFragment : Fragment() {
         categoriesProvider = CategoriesProvider(user?.sessionToken!!)
         getCategories()
 
-        abrirFormCategory?.setOnClickListener { showDialog() }
-        return myView
+        binding.abrirFormCategory?.setOnClickListener { showDialog() }
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun showDialog(){
@@ -137,6 +143,7 @@ class RestaurantCategoryListFragment : Fragment() {
 
                 override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
                     Log.d(TAG, "Error: ${t.message}")
+                    ProgressDialogFragment.hideProgressBar(requireActivity())
                     Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_LONG).show()
                 }
 
@@ -156,7 +163,9 @@ class RestaurantCategoryListFragment : Fragment() {
                     categories = response.body()!!
                     Log.d(TAG, "categories: $categories")
                     adapter = CategoriesListAdapter(requireActivity(),categories)
-                    recyclerViewCategories?.adapter = adapter
+                    binding.recyclerviewCategoriesList?.adapter = adapter
+                    binding.shimmer.isVisible = false
+                    binding.recyclerviewCategoriesList.isVisible = true
                     Log.d("FATAL","entro")
                 }
             }

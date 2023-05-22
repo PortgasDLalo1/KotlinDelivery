@@ -52,4 +52,19 @@ interface ProductsRoutes {
         @Path("id_product") id_product: String,
         @Path("imageUrl") imageUrl: String,
     ): Call<ResponseHttp>
+
+    @POST("products/updateWithOutImage")
+    fun updateWithOutImage(
+        @Body product: Product,
+        @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
+    @Multipart
+    @POST("products/update/{imageUrl}")
+    fun update(
+        @Path("imageUrl") imageUrl: String,
+        @Part image: MultipartBody.Part,
+        @Part("product") product: RequestBody,
+        @Header("Authorization") token: String
+    ): Call<ResponseHttp>
 }

@@ -39,4 +39,20 @@ interface CategoriesRoutes {
         @Path("imageUrl") imageUrl: String,
         @Header("Authorization") token: String
     ): Call<ResponseHttp>
+
+    @POST("categories/updateWithOutImage/{id_category}/{name_category}")
+    fun updateWithOutImage(
+        @Path("id_category") id_category: String,
+        @Path("name_category") name_category: String,
+        @Header("Authorization") token: String
+    ): Call<ResponseHttp>
+
+    @Multipart
+    @POST("categories/update/{imageUrl}")
+    fun update(
+        @Path("imageUrl") imageUrl: String,
+        @Part image: MultipartBody.Part,
+        @Part("category") category: RequestBody,
+        @Header("Authorization") token: String
+    ): Call<ResponseHttp>
 }

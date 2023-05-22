@@ -67,9 +67,11 @@ class ProductRestaurantListAdapter(val context: Activity, val products: ArrayLis
             bundle.putString("description", product.description)
             bundle.putString("image", product.image1)
             bundle.putString("idCategory", product.idCategory)
+
             df.arguments = bundle
             df.isCancelable = false
             df.show(f,"dialogProduct")
+
         }
 
         holder.imageViewDelete.setOnClickListener {

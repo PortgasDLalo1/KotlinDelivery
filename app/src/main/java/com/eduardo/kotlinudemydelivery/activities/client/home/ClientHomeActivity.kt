@@ -33,6 +33,7 @@ class ClientHomeActivity : AppCompatActivity() {
 
     var usersProvider: UsersProvider? = null
     var user: User? = null
+    private var myFragment: ClientCategoriesFragment? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityClientHomeBinding.inflate(layoutInflater)
@@ -40,23 +41,26 @@ class ClientHomeActivity : AppCompatActivity() {
         sharedPref = SharedPref(this)
 
         openFragment(ClientCategoriesFragment())
-
+        myFragment = ClientCategoriesFragment()
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener {
             when(it.itemId){
 
                 R.id.item_home -> {
-                    openFragment(ClientCategoriesFragment())
+                    loadFragment(ClientCategoriesFragment())
+//                    openFragment(ClientCategoriesFragment())
                     true
                 }
 
                 R.id.item_orders -> {
-                    openFragment(ClientOrdersFragment())
+                    loadFragment(ClientOrdersFragment())
+//                    openFragment(ClientOrdersFragment())
                     true
                 }
 
                 R.id.item_profile -> {
-                    openFragment(ClientProfileFragment())
+                    loadFragment(ClientProfileFragment())
+//                    openFragment(ClientProfileFragment())
                     true
                 }
 
@@ -70,6 +74,19 @@ class ClientHomeActivity : AppCompatActivity() {
         usersProvider = UsersProvider(token = user?.sessionToken!!)
         createToken()
        //binding.btnLogout.setOnClickListener { logout() }
+    }
+
+    private fun loadFragment(newFragment: Fragment){
+        if (myFragment != null){
+            val current: Fragment? = supportFragmentManager.findFragmentById(R.id.container)
+            if (current == null){
+                openFragment(newFragment)
+            }else if (!current.javaClass.name.equals(newFragment.javaClass.name)){
+                openFragment(newFragment)
+            }else{
+//                Toast.makeText(this, "${newFragment.javaClass.name}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun createToken(){

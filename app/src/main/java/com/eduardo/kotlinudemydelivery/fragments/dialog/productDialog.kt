@@ -1,5 +1,6 @@
 package com.eduardo.kotlinudemydelivery.fragments.dialog
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,17 +14,26 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
+import com.eduardo.kotlinudemydelivery.Providers.ProductsProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.fragments.restaurant.products.RestaurantProductListFragment
 import com.eduardo.kotlinudemydelivery.models.Category
+import com.eduardo.kotlinudemydelivery.models.Product
+import com.eduardo.kotlinudemydelivery.models.ResponseHttp
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
+import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.gson.Gson
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 
 class productDialog : DialogFragment() {
@@ -37,12 +47,14 @@ class productDialog : DialogFragment() {
     var idCategory2: String? = null
     private var spinnerCategories: Spinner? = null
     var categoriesProvider: CategoriesProvider? = null
+    var productsProvider: ProductsProvider? = null
     var sharedPref: SharedPref? = null
     var user: User? = null
     var categories = ArrayList<Category>()
     var btnUpdate: Button? = null
     var btnCerrar: ImageView? = null
-
+    var imageString = ""
+    private var imageFile: File? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -61,6 +73,7 @@ class productDialog : DialogFragment() {
         sharedPref = SharedPref(requireActivity())
         getUserFromSession()
         categoriesProvider = CategoriesProvider(user?.sessionToken!!)
+        productsProvider = ProductsProvider(user?.sessionToken!!)
 
         arguments?.let {
             id = it.getString("id")
@@ -70,10 +83,77 @@ class productDialog : DialogFragment() {
             descriptionProduct?.setText(it.getString("description"))
             Glide.with(requireContext()).load(it.getString("image")).into(imageProduct!!)
             btnUpdate?.setText("Modificar")
+            imageString=it.getString("image")!!
         }
         getCategories()
 
+        dialog?.window?.setBackgroundDrawableResource(R.drawable.card_radius2)
+
+        imageProduct?.setOnClickListener { selectImage() }
+
         btnCerrar?.setOnClickListener { dismiss() }
+
+        btnUpdate?.setOnClickListener {
+            val price = priceProduct?.text.toString()
+            val product = Product(
+                id = id,
+                name = nameProduct?.text.toString(),
+                description = descriptionProduct?.text.toString(),
+                price = price.toDouble(),
+                idCategory = idCategory.toString(),
+
+                )
+            ProgressDialogFragment.showProgressBar(requireActivity())
+            if (imageFile != null){
+                val partImage = imageString.split("/")
+                val image = partImage?.get(4).toString()
+
+                productsProvider?.update(image,imageFile!!, product)?.enqueue(object: Callback<ResponseHttp>{
+                    override fun onResponse(
+                        call: Call<ResponseHttp>,
+                        response: Response<ResponseHttp>
+                    ) {
+                        if (response.body() != null){
+                            ProgressDialogFragment.hideProgressBar(requireActivity())
+                            Toast.makeText(requireContext(), response.body()?.message, Toast.LENGTH_LONG).show()
+
+                            val frag: RestaurantProductListFragment = fragmentManager?.findFragmentById(R.id.container) as RestaurantProductListFragment
+                            frag.getProducts()
+                            dismiss()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                        Log.d("FATAL", "Error: ${t.message}")
+                        ProgressDialogFragment.hideProgressBar(requireActivity())
+                        Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_LONG).show()
+                    }
+                })
+            }else{
+                productsProvider?.updateWithOutImage(product)?.enqueue(object : Callback<ResponseHttp>{
+                    override fun onResponse(
+                        call: Call<ResponseHttp>,
+                        response: Response<ResponseHttp>
+                    ) {
+                        if (response.body() != null){
+                            ProgressDialogFragment.hideProgressBar(requireActivity())
+                            Toast.makeText(requireContext(), response.body()?.message, Toast.LENGTH_LONG).show()
+
+                            val frag: RestaurantProductListFragment = fragmentManager?.findFragmentById(R.id.container) as RestaurantProductListFragment
+                            frag.getProducts()
+                            dismiss()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseHttp>, t: Throwable) {
+                        Log.d("FATAL", "Error: ${t.message}")
+                        ProgressDialogFragment.hideProgressBar(requireActivity())
+                        Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_LONG).show()
+                    }
+
+                })
+            }
+        }
         return view
     }
 
@@ -123,6 +203,33 @@ class productDialog : DialogFragment() {
             //si el usuario exite en sesion
             user = gson.fromJson(sharedPref?.getData("user"), User::class.java)
         }
+    }
+
+    val startImageForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result: ActivityResult ->
+        val resultCode = result.resultCode
+        val data = result.data
+
+        if (resultCode == Activity.RESULT_OK){
+            val fileUri = data?.data
+            imageFile = File(fileUri?.path) // el archivo que vamos a guardar como imagen en el servidor
+            imageProduct?.setImageURI(fileUri)
+        }
+        else if (resultCode == ImagePicker.RESULT_ERROR){
+            Toast.makeText(requireContext(), ImagePicker.getError(data), Toast.LENGTH_LONG).show()
+        }
+        else {
+            Toast.makeText(requireContext(), "La tarea se cancelo", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun selectImage(){
+        ImagePicker.with(this)
+            .crop()
+            .compress(1024)
+            .maxResultSize(1080,1080)
+            .createIntent { intent ->
+                startImageForResult.launch(intent)
+            }
     }
 
 }

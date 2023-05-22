@@ -70,7 +70,7 @@ class RestaurantOrdersStatusFragment : Fragment() {
         fabReaload = myView?.findViewById(R.id.fab_reload)
         recyclerViewOrders?.layoutManager = LinearLayoutManager(requireContext())
 
-//        getOrders()
+        //getOrders()
 //        getOneOrder("13")
 //        connectSocket()
 //        SocketPaymentHandler.setSocket()
@@ -175,9 +175,9 @@ class RestaurantOrdersStatusFragment : Fragment() {
         if (!sharedPref?.getData("sucursal").isNullOrBlank()){
             sucursal = gson.fromJson(sharedPref?.getData("sucursal"),Sucursales::class.java)
 //            connectSocket()
-//            Log.d("FATAL",sucursal?.id!!)
+            Log.d("FATAL",sucursal?.id!!)
             getOrders()
-            connectSocket()
+//            connectSocket()
         }
     }
 

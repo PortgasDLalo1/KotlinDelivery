@@ -23,11 +23,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
 import com.eduardo.kotlinudemydelivery.Providers.ProductsProvider
 import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.adapters.ProductRestaurantListAdapter
+import com.eduardo.kotlinudemydelivery.databinding.FragmentRestaurantProductListBinding
 import com.eduardo.kotlinudemydelivery.models.Category
 import com.eduardo.kotlinudemydelivery.models.Product
 import com.eduardo.kotlinudemydelivery.models.ResponseHttp
@@ -44,10 +46,10 @@ import java.io.File
 
 class RestaurantProductListFragment : Fragment() {
 
-    var myView: View? = null
-    var recyclerProduct: RecyclerView? = null
+//    var myView: View? = null
+//    var recyclerProduct: RecyclerView? = null
     var toolbar: Toolbar? = null
-    var abrirFormProduct: TextView? = null
+//    var abrirFormProduct: TextView? = null
     var user: User? = null
     var products = ArrayList<Product>()
     var productsProvider: ProductsProvider? = null
@@ -66,19 +68,16 @@ class RestaurantProductListFragment : Fragment() {
     var priceProduct: EditText? = null
     var descriptionProduct: EditText? = null
 
+    private var _binding: FragmentRestaurantProductListBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        myView = inflater.inflate(R.layout.fragment_restaurant_product_list, container, false)
-        recyclerProduct = myView?.findViewById(R.id.recyclerview_products_list)
-        abrirFormProduct = myView?.findViewById(R.id.abrirFormProduct)
+        _binding = FragmentRestaurantProductListBinding.inflate(inflater, container, false)
+//        myView = inflater.inflate(R.layout.fragment_restaurant_product_list, container, false)
 
-        toolbar = myView?.findViewById(R.id.toolbar)
-        toolbar?.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        toolbar?.title = "Productos"
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         sharedPref = SharedPref(requireActivity())
         getUserFromSession()
@@ -86,8 +85,13 @@ class RestaurantProductListFragment : Fragment() {
         categoriesProvider = CategoriesProvider(user?.sessionToken!!)
         getProducts()
 
-        abrirFormProduct?.setOnClickListener { showDialogProduct() }
-        return myView
+        binding.abrirFormProduct?.setOnClickListener { showDialogProduct() }
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun showDialogProduct(){
@@ -223,7 +227,9 @@ class RestaurantProductListFragment : Fragment() {
                 if (response.body() != null ){
                     products = response.body()!!
                     adapter = ProductRestaurantListAdapter(requireActivity(), products)
-                    recyclerProduct?.adapter = adapter
+                    binding.recyclerviewProductsList?.adapter = adapter
+                    binding.shimmer?.isVisible = false
+                    binding.recyclerviewProductsList.isVisible = true
                 }
             }
 

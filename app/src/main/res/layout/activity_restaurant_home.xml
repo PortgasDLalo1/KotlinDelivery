@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             app:menu="@menu/bottom_navigation_menu_restaurant"
             android:layout_gravity="bottom"
-            android:background="@color/white"
+            android:background="@drawable/rounded_bottom_nav"
             app:itemIconTint="@color/black"
             app:itemTextColor="@color/black"/>
 

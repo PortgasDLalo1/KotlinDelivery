@@ -82,6 +82,7 @@ class CategoriesListAdapter(val context: Activity, val categories: ArrayList<Cat
             val fm = categoryDialog()
             val f = (context as AppCompatActivity).supportFragmentManager
             val bundle = Bundle()
+            bundle.putString("id",category.id)
             bundle.putString("name", category.name)
             bundle.putString("image", category.image)
             fm.arguments = bundle

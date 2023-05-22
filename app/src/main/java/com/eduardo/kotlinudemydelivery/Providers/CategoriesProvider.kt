@@ -35,4 +35,15 @@ class CategoriesProvider(val token: String) {
         return categoriesRoutes?.deleteCategory(id_category,imageUrl,token!!)
     }
 
+    fun updateWithOutImage(id_category: String, name_category: String):Call<ResponseHttp>?{
+        return categoriesRoutes?.updateWithOutImage(id_category,name_category,token!!)
+    }
+
+    fun update(imageUrl: String, file: File, category: Category): Call<ResponseHttp>?{
+        val reqFile = RequestBody.create(MediaType.parse("image/*"), file)
+        val image = MultipartBody.Part.createFormData("image",file.name, reqFile)
+        val requestBody = RequestBody.create(MediaType.parse("text/plain"), category.toJson())
+        return categoriesRoutes?.update(imageUrl,image,requestBody,token!!)
+    }
+
 }

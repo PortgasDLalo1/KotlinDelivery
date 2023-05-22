@@ -56,4 +56,16 @@ class ProductsProvider(val token: String) {
         return productsRoutes?.deleteProduct(id_product,imageUrl)
     }
 
+    fun updateWithOutImage(product: Product): Call<ResponseHttp>?{
+//        val requestBody = RequestBody.create(MediaType.parse("text/plain"), product.toJson())
+        return productsRoutes?.updateWithOutImage(product,token!!)
+    }
+
+    fun update(imageUrl: String, file: File, product: Product): Call<ResponseHttp>?{
+        val reqFile = RequestBody.create(MediaType.parse("image/*"), file)
+        val image = MultipartBody.Part.createFormData("image",file.name, reqFile)
+        val requestBody = RequestBody.create(MediaType.parse("text/plain"), product.toJson())
+        return productsRoutes?.update(imageUrl,image,requestBody,token!!)
+    }
+
 }

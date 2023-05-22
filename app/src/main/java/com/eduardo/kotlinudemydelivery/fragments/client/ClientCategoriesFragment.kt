@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.Providers.CategoriesProvider
@@ -69,9 +70,18 @@ class ClientCategoriesFragment : Fragment() {
         getUserFromSession()
 
         categoriesProvider = CategoriesProvider(user?.sessionToken!!)
-
+        configSwipe()
         getCategories()
         return view
+    }
+
+    private fun configSwipe() {
+        binding.swipe?.setColorSchemeResources(R.color.green, R.color.blue, R.color.orange)
+        binding.swipe?.setOnRefreshListener {
+            binding.shimmerCat?.isVisible = true
+            binding.recyclerviewCategories?.isVisible = false
+            getCategories()
+        }
     }
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -104,6 +114,9 @@ class ClientCategoriesFragment : Fragment() {
                     categories = response.body()!!
                     adapter = CategoriesAdapter(requireActivity(),categories)
                     binding.recyclerviewCategories?.adapter = adapter
+                    binding.shimmerCat?.isVisible = false
+                    binding.recyclerviewCategories?.isVisible = true
+                    binding.swipe?.isRefreshing = false
                 }
             }
 
