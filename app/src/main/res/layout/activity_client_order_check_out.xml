@@ -42,6 +42,67 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:cardCornerRadius="30dp"
+                    android:layout_margin="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_marginRight="5dp"
+                            app:cardCornerRadius="30dp"
+                            android:padding="10dp">
+
+                            <TextView
+                                android:id="@+id/btnEnvio"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Envio"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                android:textAlignment="center"
+                                android:textSize="18sp"
+                                android:background="@color/gray_light"
+                                android:padding="2dp"/>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            app:cardCornerRadius="30dp">
+
+
+                            <TextView
+                                android:id="@+id/btnRecolectar"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Recolectar"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                android:textAlignment="center"
+                                android:textSize="18sp"
+                                android:background="@color/gray_light"
+                                android:padding="2dp" />
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     app:cardCornerRadius="20dp"
                     android:layout_margin="10dp">
 

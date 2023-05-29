@@ -1,5 +1,6 @@
 package com.eduardo.kotlinudemydelivery.activities.client.products.detail
 
+import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -35,7 +36,7 @@ class ClientProductsDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClientProductsDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         product = gson.fromJson(intent.getStringExtra("product"), Product::class.java)
         sharedPref = SharedPref(this)
 

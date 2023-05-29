@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.kotlinudemydelivery.Providers.OrdersProvider
@@ -17,6 +18,7 @@ import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.restaurant.home.RestaurantHomeActivity
 import com.eduardo.kotlinudemydelivery.adapters.OrdersClientAdapter
 import com.eduardo.kotlinudemydelivery.adapters.OrdersRestaurantAdapter
+import com.eduardo.kotlinudemydelivery.databinding.FragmentRestaurantOrdersStatusBinding
 import com.eduardo.kotlinudemydelivery.models.Order
 import com.eduardo.kotlinudemydelivery.models.SocketEmit
 import com.eduardo.kotlinudemydelivery.models.SocketEmitPagado
@@ -51,14 +53,16 @@ class RestaurantOrdersStatusFragment : Fragment() {
     var gson = Gson()
 
     val TAG = "RestaurantO"
+    private var _binding: FragmentRestaurantOrdersStatusBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        myView = inflater.inflate(R.layout.fragment_restaurant_orders_status, container, false)
-
+//        myView = inflater.inflate(R.layout.fragment_restaurant_orders_status, container, false)
+        _binding = FragmentRestaurantOrdersStatusBinding.inflate(inflater, container, false)
         sharedPref = SharedPref(requireActivity())
         status = arguments?.getString("status")!!
 
@@ -66,15 +70,15 @@ class RestaurantOrdersStatusFragment : Fragment() {
 
         ordersProvider = OrdersProvider(user?.sessionToken!!)
         getSucursalFromSession()
-        recyclerViewOrders = myView?.findViewById(R.id.recyclerview_orders)
-        fabReaload = myView?.findViewById(R.id.fab_reload)
-        recyclerViewOrders?.layoutManager = LinearLayoutManager(requireContext())
+//        recyclerViewOrders = myView?.findViewById(R.id.recyclerview_orders)
+//        fabReaload = myView?.findViewById(R.id.fab_reload)
+//        recyclerViewOrders?.layoutManager = LinearLayoutManager(requireContext())
 
         //getOrders()
 //        getOneOrder("13")
-//        connectSocket()
+        connectSocket()
 //        SocketPaymentHandler.setSocket()
-        fabReaload?.setOnClickListener { getOrders() }
+        binding.fabReload?.setOnClickListener { getOrders() }
 //        SocketPaymentHandler.setSocket()
 //        SocketPaymentHandler.establishConnection()
 //        mSocket = SocketPaymentHandler.getSocket()
@@ -89,8 +93,15 @@ class RestaurantOrdersStatusFragment : Fragment() {
 //                }
 //            }
 //        }
-        return myView
+        return binding.root
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        Log.d("FATAL","SE edestruyo")
+    }
+
 
     fun getOrders(){
         Log.d("FATAL","$status ${sucursal?.id}")
@@ -103,7 +114,10 @@ class RestaurantOrdersStatusFragment : Fragment() {
                 if (response.body() != null){
                     val orders = response.body()
                     adapter = OrdersRestaurantAdapter(requireActivity(),orders!!)
-                    recyclerViewOrders?.adapter = adapter
+                    binding.recyclerviewOrders?.adapter = adapter
+                    binding.shimmer?.animate()
+                    binding.shimmer?.isVisible = false
+                    binding.recyclerviewOrders?.isVisible = true
                 }
             }
 
@@ -119,14 +133,14 @@ class RestaurantOrdersStatusFragment : Fragment() {
         SocketPaymentHandler.establishConnection()
         mSocket = SocketPaymentHandler.getSocket()
 //        mSocket?.connect()
-
+    Log.d("FATAL","$mSocket")
         mSocket?.on("pagado/${sucursal?.id.toString()}"){args ->
             if (args[0] != null){
                 activity?.runOnUiThread {
                     val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
                     Toast.makeText(context, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
 //                    getOneOrder(data.id_order)
-                    (activity as RestaurantHomeActivity).getOneOrder(data.id_order)
+//                    (activity as RestaurantHomeActivity).getOneOrder(data.id_order)
                     getOrders()
                 }
             }

@@ -24,41 +24,59 @@
             android:layout_gravity="center"
             android:layout_marginTop="70dp"/>
 
-        <EditText
-            android:id="@+id/edittext_nombres"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputName"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Nombre/s"
-            android:background="@drawable/edittext_custom"
+            android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:padding="15dp"
-            android:inputType="text"/>
+            android:layout_marginHorizontal="20dp"
+            android:hint="Nombre/s"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:endIconMode="clear_text">
 
-        <EditText
-            android:id="@+id/edittext_apellidos"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_nombres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLastName"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="20dp"
             android:hint="Apellido/s"
-            android:background="@drawable/edittext_custom"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:padding="15dp"
-            android:inputType="text"/>
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:endIconMode="clear_text">
 
-        <EditText
-            android:id="@+id/edittext_phone"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_apellidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputPhone"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Telefono"
-            android:background="@drawable/edittext_custom"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:padding="15dp"
-            android:inputType="phone"/>
+            android:layout_marginHorizontal="20dp"
+            android:hint="Telefono"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 

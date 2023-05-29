@@ -34,4 +34,7 @@ class SucursalesProvider(val token: String) {
         return  sucursalesRoutes?.create(sucursal, token)
     }
 
+    fun getRestaurantsWithImage(): Call<ArrayList<Sucursales>>?{
+        return sucursalesRoutes?.getRestaurantsWithImage(token)
+    }
 }

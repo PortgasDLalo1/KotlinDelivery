@@ -3,11 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.client.ClientOrdersStatusFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_orders"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:shimmer_auto_start="true">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include layout="@layout/cardview_orders_shimmer"/>
+            <include layout="@layout/cardview_orders_shimmer"/>
+            <include layout="@layout/cardview_orders_shimmer"/>
+            <include layout="@layout/cardview_orders_shimmer"/>
+            <include layout="@layout/cardview_orders_shimmer"/>
+
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
 </FrameLayout>

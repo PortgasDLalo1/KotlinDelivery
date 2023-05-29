@@ -6,15 +6,15 @@
         android:icon="@drawable/ic_order"
         android:title="Home"/>
 
-    <item
-        android:id="@+id/item_category"
-        android:icon="@drawable/ic_category"
-        android:title="Categorias"/>
+<!--    <item-->
+<!--        android:id="@+id/item_category"-->
+<!--        android:icon="@drawable/ic_category"-->
+<!--        android:title="Categorias"/>-->
 
-    <item
-        android:id="@+id/item_product"
-        android:icon="@drawable/ic_productos"
-        android:title="Productos"/>
+<!--    <item-->
+<!--        android:id="@+id/item_product"-->
+<!--        android:icon="@drawable/ic_productos"-->
+<!--        android:title="Productos"/>-->
 
     <item
         android:id="@+id/item_profile"

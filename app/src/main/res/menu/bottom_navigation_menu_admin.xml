@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_category"
+        android:icon="@drawable/ic_category"
+        android:title="Categorias"/>
+
+    <item
+        android:id="@+id/item_product"
+        android:icon="@drawable/ic_productos"
+        android:title="Productos"/>
+
+    <item
+        android:id="@+id/item_build"
+        android:icon="@drawable/ic_build"
+        android:title="Config."/>
+
+    <item
+        android:id="@+id/item_profile"
+        android:icon="@drawable/ic_person_pin"
+        android:title="Perfil"/>
+
+
+</menu>

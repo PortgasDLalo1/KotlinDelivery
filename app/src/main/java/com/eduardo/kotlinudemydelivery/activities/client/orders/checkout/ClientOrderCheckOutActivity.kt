@@ -2,6 +2,9 @@ package com.eduardo.kotlinudemydelivery.activities.client.orders.checkout
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
 import android.text.Editable
@@ -140,6 +143,21 @@ class ClientOrderCheckOutActivity : AppCompatActivity(), OnMapReadyCallback,Dire
             }else{
                 createPayment() 
             }
+        }
+
+        binding.btnEnvio?.setOnClickListener {
+            binding.btnRecolectar?.background = ColorDrawable(resources.getColor(R.color.gray_light))
+            binding.btnRecolectar?.setTextColor(resources.getColor(R.color.black))
+            binding.btnEnvio?.background = ColorDrawable(resources.getColor(R.color.green))
+            binding.btnEnvio?.setTextColor(resources.getColor(R.color.white))
+
+        }
+
+        binding.btnRecolectar?.setOnClickListener {
+            binding.btnRecolectar?.background = ColorDrawable(resources.getColor(R.color.green))
+            binding.btnRecolectar?.setTextColor(resources.getColor(R.color.white))
+            binding.btnEnvio?.background = ColorDrawable(resources.getColor(R.color.gray_light))
+            binding.btnEnvio?.setTextColor(resources.getColor(R.color.black))
         }
     }
 

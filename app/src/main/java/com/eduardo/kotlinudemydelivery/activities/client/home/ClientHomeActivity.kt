@@ -1,6 +1,7 @@
 package com.eduardo.kotlinudemydelivery.activities.client.home
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +39,7 @@ class ClientHomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClientHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         sharedPref = SharedPref(this)
 
         openFragment(ClientCategoriesFragment())

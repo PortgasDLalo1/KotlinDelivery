@@ -64,6 +64,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
     var printables = ArrayList<Printable>()
     var orders1 : Order?= null
     private lateinit var myFragment: RestaurantOrdersStatusFragment
+    private var fragmentOrderStatus = RestaurantOrdersStatusFragment()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRestaurantHomeBinding.inflate(layoutInflater)
@@ -90,19 +91,19 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                     true
                 }
 
-                R.id.item_category -> {
-//                    openFragment(RestaurantCategoryFragment())
-//                    openFragment(RestaurantCategoryListFragment())
-                    loadFragment(RestaurantCategoryListFragment())
-                    true
-                }
-
-                R.id.item_product -> {
-                    loadFragment(RestaurantProductListFragment())
-//                    openFragment(RestaurantProductListFragment())
-//                    openFragment(RestaurantProductFragment())
-                    true
-                }
+//                R.id.item_category -> {
+////                    openFragment(RestaurantCategoryFragment())
+////                    openFragment(RestaurantCategoryListFragment())
+//                    loadFragment(RestaurantCategoryListFragment())
+//                    true
+//                }
+//
+//                R.id.item_product -> {
+//                    loadFragment(RestaurantProductListFragment())
+////                    openFragment(RestaurantProductListFragment())
+////                    openFragment(RestaurantProductFragment())
+//                    true
+//                }
 
                 R.id.item_profile -> {
                     loadFragment(ClientProfileFragment())
@@ -155,8 +156,7 @@ class RestaurantHomeActivity : AppCompatActivity(), PrintingCallback {
                     val data = gson.fromJson(args[0].toString(), SocketEmitPagado::class.java)
                    Toast.makeText(this, "Id_Order: ${data.id_order}", Toast.LENGTH_SHORT).show()
                     getOneOrder(data.id_order)
-                    myFragment = RestaurantOrdersStatusFragment()
-                    myFragment.getOrders()
+//
                 }
             }
         }

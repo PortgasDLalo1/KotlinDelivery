@@ -11,6 +11,7 @@ import com.eduardo.kotlinudemydelivery.R
 import com.eduardo.kotlinudemydelivery.activities.restaurant.config.delivery.RestaurantDeliveryConfigActivity
 import com.eduardo.kotlinudemydelivery.activities.restaurant.config.box.RestaurantConfigBoxActivity
 import com.eduardo.kotlinudemydelivery.activities.restaurant.config.waiter.RestaurantConfigWaiterActivity
+import com.eduardo.kotlinudemydelivery.activities.sucursal.SucursalHomeActivity
 
 class RestaurantConfigFragment : Fragment() {
 
@@ -19,7 +20,7 @@ class RestaurantConfigFragment : Fragment() {
     var cardDelivery: CardView? = null
     var cardCaja: CardView? = null
     var cardMeseros: CardView? = null
-
+    var cardSucursal: CardView? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,14 +31,20 @@ class RestaurantConfigFragment : Fragment() {
         cardDelivery = myView?.findViewById(R.id.cardDelivery)
         cardCaja = myView?.findViewById(R.id.cardCaja)
         cardMeseros = myView?.findViewById(R.id.cardMeseros)
+        cardSucursal = myView?.findViewById(R.id.cardSucursales)
 
         cardDelivery?.setOnClickListener { goToDeliveryConfig() }
         cardCaja?.setOnClickListener { goToBox() }
         cardMeseros?.setOnClickListener { goToWaiters() }
+        cardSucursal?.setOnClickListener { goToSucursalConfig() }
 
         return myView
     }
 
+    private fun goToSucursalConfig(){
+        val i = Intent(requireContext(), SucursalHomeActivity::class.java)
+        startActivity(i)
+    }
     private fun goToDeliveryConfig(){
         val i = Intent(requireContext(), RestaurantDeliveryConfigActivity::class.java)
         startActivity(i)

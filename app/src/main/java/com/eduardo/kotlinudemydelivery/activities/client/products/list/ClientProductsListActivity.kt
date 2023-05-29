@@ -1,5 +1,6 @@
 package com.eduardo.kotlinudemydelivery.activities.client.products.list
 
+import android.content.pm.ActivityInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -39,7 +40,7 @@ class ClientProductsListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClientProductsListBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_client_products_list)
-
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         toolbar = findViewById(R.id.toolbar)
         toolbar?.title = "Productos"
         toolbar?.setTitleTextColor(ContextCompat.getColor(this,R.color.black))
@@ -51,7 +52,7 @@ class ClientProductsListActivity : AppCompatActivity() {
         productsProvider = ProductsProvider(user?.sessionToken!!)
 
         recyclerViewProducts = findViewById(R.id.recyclerview_products)
-        recyclerViewProducts?.layoutManager = GridLayoutManager(this,2)
+//        recyclerViewProducts?.layoutManager = GridLayoutManager(this,2)
 
         getProducts()
     }

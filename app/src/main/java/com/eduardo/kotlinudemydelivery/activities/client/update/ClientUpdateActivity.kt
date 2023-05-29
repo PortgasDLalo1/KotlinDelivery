@@ -1,6 +1,7 @@
 package com.eduardo.kotlinudemydelivery.activities.client.update
 
 import android.app.Activity
+import android.content.pm.ActivityInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -38,7 +39,7 @@ class ClientUpdateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClientUpdateBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         sharedPref = SharedPref(this)
 
         toolbar = findViewById(R.id.toolbar)

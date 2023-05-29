@@ -21,6 +21,7 @@ import androidx.core.widget.addTextChangedListener
 import com.eduardo.kotlinudemydelivery.Providers.SucursalesProvider
 import com.eduardo.kotlinudemydelivery.Providers.UsersProvider
 import com.eduardo.kotlinudemydelivery.R
+import com.eduardo.kotlinudemydelivery.activities.admin.home.adminHomeActivity
 import com.eduardo.kotlinudemydelivery.activities.client.home.ClientHomeActivity
 import com.eduardo.kotlinudemydelivery.activities.delivery.home.DeliveryHomeActivity
 import com.eduardo.kotlinudemydelivery.activities.restaurant.home.RestaurantHomeActivity
@@ -152,6 +153,12 @@ class MainActivity : AppCompatActivity() {
         startActivity(i)
     }
 
+    private fun goToAdminHome(){
+        val i = Intent(this, adminHomeActivity::class.java)
+        i.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK //eliminar historial de pantallas
+        startActivity(i)
+    }
+
     private fun goToSelectRol(){
         val i = Intent(this, SelectRolesActivity::class.java)
         i.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK //eliminar historial de pantallas
@@ -177,6 +184,8 @@ class MainActivity : AppCompatActivity() {
                 goToDeliveryHome()
             }else if (idRol == 4){
                 goToWaiterHome()
+            }else if (idRol == 5){
+                goToAdminHome()
             }
         }
     }
@@ -209,6 +218,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 else if (nameRol == "MESERO"){
                     goToWaiterHome()
+                }
+                else if (nameRol == "ADMINISTRADOR"){
+                    goToAdminHome()
                 }
             }
             else{
