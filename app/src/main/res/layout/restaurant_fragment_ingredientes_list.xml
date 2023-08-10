@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.restaurant.ingredientes.RestaurantIngredientesListFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingredientes"
+            android:layout_marginLeft="10dp"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/roboto_regular" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_ingredientes_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="20dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            android:layoutAnimation="@anim/layout_animation"
+            android:visibility="visible"/>
+
+        <!--shimmer-->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="10dp"/>
+
+        <TextView
+            android:id="@+id/abrirFormIngrediente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Agrega un ingrediente"
+            android:layout_marginBottom="10dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/roboto_regular"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginBottom="70dp"/>
+    </LinearLayout>
+
+</RelativeLayout>

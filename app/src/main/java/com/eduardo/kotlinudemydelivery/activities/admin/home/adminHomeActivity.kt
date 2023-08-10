@@ -12,6 +12,7 @@ import com.eduardo.kotlinudemydelivery.fragments.client.ClientProfileFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.RestaurantConfigFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.RestaurantOrdersStatusFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.categories.RestaurantCategoryListFragment
+import com.eduardo.kotlinudemydelivery.fragments.restaurant.ingredientes.RestaurantIngredientesListFragment
 import com.eduardo.kotlinudemydelivery.fragments.restaurant.products.RestaurantProductListFragment
 import com.eduardo.kotlinudemydelivery.models.User
 import com.eduardo.kotlinudemydelivery.utils.SharedPref
@@ -47,6 +48,11 @@ class adminHomeActivity : AppCompatActivity() {
 //                    openFragment(RestaurantCategoryFragment())
 //                    openFragment(RestaurantCategoryListFragment())
                     loadFragment(RestaurantCategoryListFragment())
+                    true
+                }
+
+                R.id.item_ingredientes -> {
+                    loadFragment(RestaurantIngredientesListFragment())
                     true
                 }
 
